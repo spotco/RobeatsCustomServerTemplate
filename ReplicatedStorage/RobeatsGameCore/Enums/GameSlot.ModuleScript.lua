@@ -21,30 +21,30 @@ end
 local DEFAULT_HORIZ_DISTANCE = 36.5
 local DEFAULT_UP_DISTANCE = 14
 local DEFAULT_LOOKAT_HORIZ_DISTANCE = 17.5
-function GameSlot:slot_to_camera_cframe(slot, world_center_position)
+function GameSlot:slot_to_camera_cframe_offset(slot)
 	
 	if slot == GameSlot.SLOT_1 then	
 		return 	CFrame.new(
-			Vector3.new(-DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, DEFAULT_HORIZ_DISTANCE) + world_center_position,
-			Vector3.new(-DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, DEFAULT_LOOKAT_HORIZ_DISTANCE) + world_center_position
+			Vector3.new(-DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, DEFAULT_HORIZ_DISTANCE),
+			Vector3.new(-DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, DEFAULT_LOOKAT_HORIZ_DISTANCE)
 		)		
 		
 	elseif slot == GameSlot.SLOT_2 then
 		return 	CFrame.new(
-			Vector3.new(-DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, -DEFAULT_HORIZ_DISTANCE) + world_center_position,
-			Vector3.new(-DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, -DEFAULT_LOOKAT_HORIZ_DISTANCE) + world_center_position
+			Vector3.new(-DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, -DEFAULT_HORIZ_DISTANCE),
+			Vector3.new(-DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, -DEFAULT_LOOKAT_HORIZ_DISTANCE)
 		)		
 		
 	elseif slot == GameSlot.SLOT_3 then
 		return 	CFrame.new(
-			Vector3.new(DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, -DEFAULT_HORIZ_DISTANCE) + world_center_position,
-			Vector3.new(DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, -DEFAULT_LOOKAT_HORIZ_DISTANCE) + world_center_position
+			Vector3.new(DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, -DEFAULT_HORIZ_DISTANCE),
+			Vector3.new(DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, -DEFAULT_LOOKAT_HORIZ_DISTANCE)
 		)			
 		
 	else
 		return 	CFrame.new(
-			Vector3.new(DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, DEFAULT_HORIZ_DISTANCE) + world_center_position,
-			Vector3.new(DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, DEFAULT_LOOKAT_HORIZ_DISTANCE) + world_center_position
+			Vector3.new(DEFAULT_HORIZ_DISTANCE, DEFAULT_UP_DISTANCE, DEFAULT_HORIZ_DISTANCE),
+			Vector3.new(DEFAULT_LOOKAT_HORIZ_DISTANCE, 0, DEFAULT_LOOKAT_HORIZ_DISTANCE)
 		)			
 		
 	end

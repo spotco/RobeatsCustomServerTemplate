@@ -49,7 +49,7 @@ function RobeatsGame:new(local_services, _game_environment_center_position)
 
 	function self:setup_world(game_slot)
 		_local_game_slot = game_slot
-		workspace.CurrentCamera.CFrame = GameSlot:slot_to_camera_cframe(self:get_local_game_slot(), self:get_game_environment_center_position())
+		workspace.CurrentCamera.CFrame = GameSlot:slot_to_camera_cframe_offset(self:get_local_game_slot()) + self:get_game_environment_center_position()
 		workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		workspace.CurrentCamera.CameraSubject = nil
 	end
