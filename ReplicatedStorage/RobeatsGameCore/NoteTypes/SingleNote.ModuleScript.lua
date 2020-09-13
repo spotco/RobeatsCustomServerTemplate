@@ -1,7 +1,7 @@
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local NoteBase = require(game.ReplicatedStorage.RobeatsGameCore.NoteTypes.NoteBase)
-local NoteResult = require(game.ReplicatedStorage.Shared.NoteResult)
+local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local SFXManager = require(game.ReplicatedStorage.RobeatsGameCore.SFXManager)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 

@@ -87,4 +87,12 @@ function SPUtil:try(call)
 	end)
 end
 
+function SPUtil:look_at(eye, target)
+	local forwardVector = (target - eye).Unit
+	local upVector = Vector3.new(0, 1, 0)
+	local rightVector = forwardVector:Cross(upVector)
+	local upVector2 = rightVector:Cross(forwardVector)
+	return CFrame.fromMatrix(eye, rightVector, upVector2)
+end
+
 return SPUtil

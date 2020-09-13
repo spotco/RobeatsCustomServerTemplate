@@ -1,7 +1,7 @@
 local EffectSystem = require(game.ReplicatedStorage.RobeatsGameCore.Effects.EffectSystem)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
-local NoteResult = require(game.ReplicatedStorage.Shared.NoteResult)
+local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 
 local HoldingNoteEffect = {}

@@ -1,6 +1,6 @@
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
-local NoteResult = require(game.ReplicatedStorage.Shared.NoteResult)
+local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local SFXManager = require(game.ReplicatedStorage.RobeatsGameCore.SFXManager)
 local InputUtil = require(game.ReplicatedStorage.Shared.InputUtil)
 local NoteResultPopupEffect = require(game.ReplicatedStorage.RobeatsGameCore.Effects.NoteResultPopupEffect)
@@ -52,10 +52,6 @@ function ScoreManager:new(_game)
 		if params.PlayHoldEffect == nil then params.PlayHoldEffect = true; end
 		if params.HoldEffectPosition == nil then params.HoldEffectPosition = _game:get_tracksystem(slot_index):get_track(track_index):get_end_position(); end
 
-		if params.TimeMiss then
-			_game:get_tracksystem(slot_index):notify_time_miss()
-		end
-
 		if _last_created_note_result_popup_effect ~= nil then
 			if slot_index == _last_created_note_result_popup_info.Slot and
 				track_index == _last_created_note_result_popup_info.Track and
@@ -77,7 +73,7 @@ function ScoreManager:new(_game)
 		local track = _game:get_tracksystem(slot_index):get_track(track_index)
 		_last_created_note_result_popup_effect = _game._effects:add_effect(NoteResultPopupEffect:new(
 			_game,
-			track:get_end_position() + Vector3.new(0,1.5,0) + (track:world_to_player_dirn() * 2),
+			track:get_end_position() + Vector3.new(0,0.25,0),
 			note_result
 		))
 		_last_created_note_result_popup_info.Slot = slot_index

@@ -1,7 +1,7 @@
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local NoteBase = require(game.ReplicatedStorage.RobeatsGameCore.NoteTypes.NoteBase)
-local NoteResult = require(game.ReplicatedStorage.Shared.NoteResult)
+local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local SFXManager = require(game.ReplicatedStorage.RobeatsGameCore.SFXManager)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
@@ -36,13 +36,13 @@ function HeldNote:new(
 
 	local _note_obj = nil
 
-	local _body = nil
-	local _head = nil
-	local _tail = nil
-	local _head_outline = nil
-	local _tail_outline = nil
-	local _body_outline_left = nil
-	local _body_outline_right = nil
+	local _body
+	local _head
+	local _tail
+	local _head_outline
+	local _tail_outline
+	local _body_outline_left
+	local _body_outline_right
 	local _body_adorn, _head_adorn, _tail_adorn, _head_outline_adorn, _tail_outline_adorn, _body_outline_left_adorn, _body_outline_right_adorn
 
 	local _game_audio_manager_get_current_time_ms = 0

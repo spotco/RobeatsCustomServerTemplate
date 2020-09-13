@@ -5,7 +5,7 @@ local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local MenuSystem = require(game.ReplicatedStorage.Menus.System.MenuSystem)
-local GameSlot = require(game.ReplicatedStorage.Shared.GameSlot)
+local GameSlot = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameSlot)
 
 local SongStartMenu = require(game.ReplicatedStorage.Menus.SongStartMenu)
 

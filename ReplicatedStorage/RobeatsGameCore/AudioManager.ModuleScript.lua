@@ -1,7 +1,7 @@
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local SFXManager = require(game.ReplicatedStorage.RobeatsGameCore.SFXManager)
-local NoteResult = require(game.ReplicatedStorage.Shared.NoteResult)
+local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local RandomLua = require(game.ReplicatedStorage.Shared.RandomLua)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
 local Constants = require(game.ReplicatedStorage.Shared.Constants)
@@ -137,7 +137,7 @@ function AudioManager:new(_game)
 		AssertType:is_int(track_number)
 
 		for slot_id,tracksystem in _game:tracksystems_itr() do
-			tracksystem._notes:push_back(
+			tracksystem:get_notes():push_back(
 				SingleNote:new(
 					_game,
 					track_number,
@@ -159,7 +159,7 @@ function AudioManager:new(_game)
 		AssertType:is_int(track_number)
 
 		for slot_id,tracksystem in _game:tracksystems_itr() do
-			tracksystem._notes:push_back(
+			tracksystem:get_notes():push_back(
 				HeldNote:new(
 					_game,
 					track_number,

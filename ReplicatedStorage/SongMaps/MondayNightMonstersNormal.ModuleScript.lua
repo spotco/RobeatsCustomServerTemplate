@@ -15,7 +15,8 @@ rtv.HitObjects = {}
 local function note(time,track) rtv.HitObjects[#rtv.HitObjects+1]={Time=time;Type=1;Track=track;} end
 local function hold(time,track,duration) rtv.HitObjects[#rtv.HitObjects+1] = {Time=time;Type=2;Track=track;Duration=duration;}  end
 --
-note(2370,1)--0
+hold(0,1,1000)
+--note(2370,1)--0
 note(4170,2)--1
 note(4770,1)--2
 note(6570,3)--3

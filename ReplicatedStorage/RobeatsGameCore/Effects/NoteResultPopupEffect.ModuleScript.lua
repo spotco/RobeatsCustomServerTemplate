@@ -1,7 +1,7 @@
 local EffectSystem = require(game.ReplicatedStorage.RobeatsGameCore.Effects.EffectSystem)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
-local NoteResult = require(game.ReplicatedStorage.Shared.NoteResult)
+local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 
@@ -26,7 +26,7 @@ function NoteResultPopupEffect:new(_game, _position, _result)
 	
 		_effect_obj = _game._object_pool:depool(self.ClassName)
 		if _effect_obj == nil then
-			_effect_obj = EnvironmentSetup:get_element_protos_folder().PopupScoreEffect:Clone()
+			_effect_obj = EnvironmentSetup:get_element_protos_folder().PopupScoreEffectProto:Clone()
 		end
 		
 		_frame = _effect_obj.Panel.SurfaceGui.Frame
