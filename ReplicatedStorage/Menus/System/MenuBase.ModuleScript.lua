@@ -9,8 +9,8 @@ function MenuBase:new()
 	
 	function self:set_is_top_element(val) end
 	function self:update(dt_scale) end
-	function self:should_remove() DebugOut:errf("MenuBase needs to implement should_remove") end
-	function self:do_remove() DebugOut:errf("MenuBase needs to implement do_remove") end
+	function self:should_remove() return false end
+	function self:do_remove() end
 	
 	return self
 end

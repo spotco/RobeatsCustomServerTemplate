@@ -5,9 +5,8 @@ local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local MenuSystem = require(game.ReplicatedStorage.Menus.System.MenuSystem)
-local GameSlot = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameSlot)
 
-local SongStartMenu = require(game.ReplicatedStorage.Menus.SongStartMenu)
+local SongSelectMenu = require(game.ReplicatedStorage.Menus.SongSelectMenu)
 
 local function game_init()
 	EnvironmentSetup:initial_setup()
@@ -19,8 +18,7 @@ local function game_init()
 		_menus = MenuSystem:new();
 	}
 	
-	local start_song_key = 1
-	local_services._menus:push_menu(SongStartMenu:new(local_services, start_song_key, GameSlot.SLOT_1))
+	local_services._menus:push_menu(SongSelectMenu:new(local_services))
 	
 	local update_connection
 	update_connection = game:GetService("RunService").Heartbeat:Connect(function(tick_delta)

@@ -2,7 +2,7 @@ local rtv = {}
 rtv.AudioAssetId = "rbxassetid://1305438247"
 rtv.AudioFilename = "Monday Night Monsters"
 rtv.AudioDescription = "The main theme to MONDAY NIGHT MONSTERS, a 2016 game by spotco. FinnMK is also the main composer for Robeats!"
-rtv.AudioCoverImageAssetId = "rbxgameasset://Images/COVERIMG_welcometomondaynight_finnmk"
+rtv.AudioCoverImageAssetId = "rbxassetid://698514070"
 rtv.AudioArtist = "FinnMK"
 rtv.AudioDifficulty = 1
 rtv.AudioTimeOffset = -75
@@ -15,8 +15,7 @@ rtv.HitObjects = {}
 local function note(time,track) rtv.HitObjects[#rtv.HitObjects+1]={Time=time;Type=1;Track=track;} end
 local function hold(time,track,duration) rtv.HitObjects[#rtv.HitObjects+1] = {Time=time;Type=2;Track=track;Duration=duration;}  end
 --
-hold(0,1,1000)
---note(2370,1)--0
+note(2370,1)--0
 note(4170,2)--1
 note(4770,1)--2
 note(6570,3)--3

@@ -59,6 +59,7 @@ function AudioManager:new(_game)
 	--The game audio
 	local _bgm = Instance.new("Sound", EnvironmentSetup:get_local_elements_folder())
 	_bgm.Name = "BGM"
+	function self:get_bgm() return _bgm end
 	
 	--Keeping track of BGM TimePosition ourselves (Sound.TimePosition does not update at 60fps)
 	local _bgm_time_position = 0
@@ -89,7 +90,7 @@ function AudioManager:new(_game)
 		_song_key = song_key
 		_current_mode = AudioManager.Mode.Loading
 		_audio_data_index = 1
-		_current_audio_data = SongDatabase:singleton():get_data_for_key(_song_key)
+		_current_audio_data = SongDatabase:get_data_for_key(_song_key)
 		for i=1,#_current_audio_data.HitObjects do
 			local itr = _current_audio_data.HitObjects[i]
 			if itr.Type == 1 then

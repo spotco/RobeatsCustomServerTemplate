@@ -7,11 +7,14 @@ local SongMapList = require(game.Workspace.SongMapList)
 
 local SongDatabase = {}
 
-SongDatabase.MOD_NORMAL = 0
-SongDatabase.MOD_HARDMODE = 1
+SongDatabase.SongMode = {
+	Normal = 0;
+	SupporterOnly = 1;
+}
 
 function SongDatabase:new()
 	local self = {}
+	self.SongMode = SongDatabase.SongMode
 
 	local _all_keys = SPDict:new()
 	local _key_list = SPList:new()
@@ -36,8 +39,8 @@ function SongDatabase:new()
 		_key_list:push_back(key)
 	end
 
-	function self:all_keys()
-		return _key_list
+	function self:key_itr()
+		return _all_keys:key_itr()
 	end
 
 	function self:get_data_for_key(key)
@@ -51,9 +54,9 @@ function SongDatabase:new()
 	function self:key_get_audiomod(key)
 		local data = self:get_data_for_key(key)
 		if data.AudioMod == 1 then
-			return SongDatabase.MOD_HARDMODE
+			return SongDatabase.SongMode.SupporterOnly
 		end
-		return SongDatabase.MOD_NORMAL
+		return SongDatabase.SongMode.Normal
 	end
 
 	function self:render_coverimage_for_key(cover_image, overlay_image, key)
@@ -61,11 +64,10 @@ function SongDatabase:new()
 		cover_image.Image = songdata.AudioCoverImageAssetId
 
 		local audiomod = self:key_get_audiomod(key)
-		if audiomod == SongDatabase.MOD_HARDMODE then
-			overlay_image.Image = "rbxgameasset://Images/COVER_hardmode_overlay"
+		if audiomod == SongDatabase.SongMode.SupporterOnly then
+			overlay_image.Image = "rbxassetid://837274453"
 			overlay_image.Visible = true
 		else
-			overlay_image.Image = "rbxgameasset://Images/COVER_hardmode_overlay"
 			overlay_image.Visible = false
 		end
 	end
@@ -89,14 +91,11 @@ function SongDatabase:new()
 		local songdata = self:get_data_for_key(key)
 		return songdata.AudioDescription
 	end
+	
+	function self:invalid_songkey() return -1 end
 
 	self:cons()
 	return self
 end
 
-local _singleton = SongDatabase:new()
-function SongDatabase:singleton()
-	return _singleton
-end
-
-return SongDatabase
+return SongDatabase:new()

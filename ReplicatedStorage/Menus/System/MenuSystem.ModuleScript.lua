@@ -18,18 +18,32 @@ function MenuSystem:new()
 		tar_menu:set_is_top_element(true)
 	end
 	
+	function self:get_top_menu() return _menu_stack:get(_menu_stack:count()) end
+	
 	function self:update(dt_scale)
-		if _menu_stack:count() > 0 then
-			local menu_top = _menu_stack:get(_menu_stack:count())
-			menu_top:update(dt_scale)
-			if menu_top:should_remove() then
-				menu_top:do_remove()
-				_menu_stack:remove(menu_top)
-				if _menu_stack:count() > 0 then
-					menu_top = _menu_stack:get(_menu_stack:count())
-					menu_top:set_is_top_element(true)
-				end
+		local top_menu = self:get_top_menu()
+		if top_menu then
+			top_menu:update(dt_scale)
+			if top_menu:should_remove() then
+				self:remove_menu(top_menu)
 			end
+		end
+	end
+	
+	function self:remove_menu(tar_menu)
+		local top_menu_pre = self:get_top_menu()
+		for i=1,_menu_stack:count() do
+			local itr_menu = _menu_stack:get(i)
+			if tar_menu == itr_menu then
+				tar_menu:do_remove()
+				_menu_stack:remove(itr_menu)
+				break
+			end
+		end
+		
+		local top_menu_post = self:get_top_menu()
+		if top_menu_post and top_menu_pre ~= top_menu_post then
+			top_menu_post:set_is_top_element(true)
 		end
 	end
 	
