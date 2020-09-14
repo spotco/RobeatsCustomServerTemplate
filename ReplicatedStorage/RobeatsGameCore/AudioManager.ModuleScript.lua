@@ -58,11 +58,6 @@ function AudioManager:new(_game)
 	local _song_key = 0
 	function self:get_song_key() return _song_key end
 
-	local _last_held_note_hit_time = 0
-	function self:notify_held_note_begin(hit_time)
-		_last_held_note_hit_time = hit_time
-	end
-
 	local _note_count = 0
 	function self:get_note_count() return _note_count end
 	function self:load_song(song_key)
@@ -107,8 +102,6 @@ function AudioManager:new(_game)
 		else
 			self._note_gen_rand = RandomLua.mwc(self._current_audio_data.RandomSeed)
 		end
-
-		_last_held_note_hit_time = self._current_audio_data.HitObjects[1].Time
 	end
 
 	function self:teardown()

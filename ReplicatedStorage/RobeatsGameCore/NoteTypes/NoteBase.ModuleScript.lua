@@ -15,10 +15,6 @@ function NoteBase:NoteBase()
 
 	function self:get_track_index() error("NoteBase must implement get_track_index") return 0 end
 
-	function self:color3_for_slot(slot)
-		return Color3.fromRGB(254, 226, 19)
-	end
-
 	return self
 end
 

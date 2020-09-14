@@ -7,6 +7,7 @@ local GameTrack = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameTrack
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local DebugConfig = require(game.ReplicatedStorage.Shared.DebugConfig)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
+local HitParams = require(game.ReplicatedStorage.RobeatsGameCore.HitParams)
 
 local NoteTrackSystem = {}
 
@@ -14,16 +15,23 @@ function NoteTrackSystem:new(_game, _game_slot)
 	local self = {}
 	
 	local _obj
+	
+	--List of all notes active for this system
 	local _notes = SPList:new()
+	
+	--List of all tracks active for this system
 	local _tracks = SPList:new()
 
 	function self:cons()
+		--Clone "NoteTrackSystemProto" and use the elements in-game
 		_obj = EnvironmentSetup:get_element_protos_folder().NoteTrackSystemProto:Clone()
 		_obj:SetPrimaryPartCFrame(SPUtil:look_at(
 			_game:get_game_environment_center_position(),
 			_game:get_game_environment_center_position() + GameSlot:slot_to_world_position_offset(_game_slot)
 		))
 		_obj.Parent = EnvironmentSetup:get_local_elements_folder()
+		
+		--For every defined enum value in GameTrack, create a NoteTrack for it
 		for track_enum_name,track_enum_value in GameTrack:track_itr() do
 			local tar_track_obj = _obj:FindFirstChild(track_enum_name)
 			if tar_track_obj == nil then
@@ -88,11 +96,12 @@ function NoteTrackSystem:new(_game, _game_slot)
 		end
 
 		if hit_found == false then
+			--Ghost tapping, comment out to disable
 			_game._score_manager:register_hit(
 				NoteResult.Miss,
 				_game_slot,
 				track_index,
-				{ PlaySFX = true; PlayHoldEffect = false; WhiffMiss = true; }
+				HitParams:new():set_play_hold_effect(false):set_whiff_miss(true)
 			)
 		end
 	end

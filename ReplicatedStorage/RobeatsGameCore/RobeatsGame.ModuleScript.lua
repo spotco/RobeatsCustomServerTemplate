@@ -86,10 +86,8 @@ function RobeatsGame:new(local_services, _game_environment_center_position)
 				itr:update(dt_scale)
 			end
 			
-			self._effects:update(dt_scale,self)
-			self._score_manager:update(dt_scale,self)
-			
-			self._score_manager:post_update()
+			self._effects:update(dt_scale)
+			self._score_manager:update(dt_scale)
 		end
 	end
 	
