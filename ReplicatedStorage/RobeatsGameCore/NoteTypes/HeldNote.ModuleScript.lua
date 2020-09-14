@@ -295,7 +295,7 @@ function HeldNote:new(
 		self:update_visual(dt_scale)
 
 		if _state == HeldNote.State.Pre then
-			if _game._audio_manager:get_current_time_ms() > (_hit_time_ms - _game._audio_manager.NOTE_REMOVE_TIME) then
+			if _game._audio_manager:get_current_time_ms() > (_hit_time_ms - _game._audio_manager:get_note_remove_time()) then
 				
 				--Time missed first hit
 				_game._score_manager:register_hit(
@@ -330,7 +330,7 @@ function HeldNote:new(
 				end
 			end
 
-			if _game._audio_manager:get_current_time_ms() > (get_tail_hit_time() - _game._audio_manager.NOTE_REMOVE_TIME) then
+			if _game._audio_manager:get_current_time_ms() > (get_tail_hit_time() - _game._audio_manager:get_note_remove_time()) then
 				if _state == HeldNote.State.Holding or _state == HeldNote.State.HoldMissedActive then
 					_game._effects:add_effect(HoldingNoteEffect:new(
 						_game,

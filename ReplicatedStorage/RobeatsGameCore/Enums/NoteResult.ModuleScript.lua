@@ -6,21 +6,20 @@ local NoteResult = {
 }
 
 function NoteResult:timedelta_to_result(time_to_end, _game)
-	if time_to_end >= _game._audio_manager.NOTE_OKAY_MIN and time_to_end <= _game._audio_manager.NOTE_OKAY_MAX then
-		local note_result = nil			
-		
-		if time_to_end > _game._audio_manager.NOTE_OKAY_MIN and time_to_end <= _game._audio_manager.NOTE_GREAT_MIN then
+	local note_okay_max, note_great_max, note_perfect_max, note_perfect_min, note_great_min, note_okay_min = _game._audio_manager:get_note_result_timing()
+	if time_to_end >= note_okay_min and time_to_end <= note_okay_max then
+		local note_result
+		if time_to_end > note_okay_min and time_to_end <= note_great_min then
 			note_result = NoteResult.Okay
-		elseif time_to_end > _game._audio_manager.NOTE_GREAT_MIN and time_to_end <= _game._audio_manager.NOTE_PERFECT_MIN then
+		elseif time_to_end > note_great_min and time_to_end <= note_perfect_min then
 			note_result = NoteResult.Great
-		elseif time_to_end > _game._audio_manager.NOTE_PERFECT_MIN and time_to_end <= _game._audio_manager.NOTE_PERFECT_MAX then
+		elseif time_to_end > note_perfect_min and time_to_end <= note_perfect_max then
 			note_result = NoteResult.Perfect
-		elseif time_to_end > _game._audio_manager.NOTE_PERFECT_MAX and time_to_end <= _game._audio_manager.NOTE_GREAT_MAX then
+		elseif time_to_end > note_perfect_max and time_to_end <= note_great_max then
 			note_result = NoteResult.Great
 		else
 			note_result = NoteResult.Okay
 		end
-		
 		return true, note_result
 	end	
 	

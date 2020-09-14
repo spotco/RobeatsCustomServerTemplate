@@ -119,7 +119,7 @@ function SingleNote:new(_game, _track_index, _slot_index, _creation_time_ms, _hi
 
 	--[[Override--]] function self:should_remove()
 		--Remove if state is DoRemove (set on hit), or if NOTE_REMOVE_TIME past the hit time
-		return _state == SingleNote.State.DoRemove or self:get_time_to_end() < _game._audio_manager.NOTE_REMOVE_TIME
+		return _state == SingleNote.State.DoRemove or self:get_time_to_end() < _game._audio_manager:get_note_remove_time()
 	end
 	
 	function self:get_time_to_end()

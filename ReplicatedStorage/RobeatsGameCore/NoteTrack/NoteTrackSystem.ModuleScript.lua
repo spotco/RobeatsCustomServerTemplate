@@ -5,7 +5,6 @@ local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
 local NoteResult = require(game.ReplicatedStorage.RobeatsGameCore.Enums.NoteResult)
 local GameTrack = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameTrack)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
-local DebugConfig = require(game.ReplicatedStorage.Shared.DebugConfig)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local HitParams = require(game.ReplicatedStorage.RobeatsGameCore.HitParams)
 

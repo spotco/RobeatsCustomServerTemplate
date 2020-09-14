@@ -6,7 +6,6 @@ local InputUtil = require(game.ReplicatedStorage.Shared.InputUtil)
 local NoteResultPopupEffect = require(game.ReplicatedStorage.RobeatsGameCore.Effects.NoteResultPopupEffect)
 local HoldingNoteEffect = require(game.ReplicatedStorage.RobeatsGameCore.Effects.HoldingNoteEffect)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
-local DebugConfig = require(game.ReplicatedStorage.Shared.DebugConfig)
 
 local ScoreManager = {}
 
@@ -50,13 +49,13 @@ function ScoreManager:new(_game)
 			if _frame_has_played_sfx == false then
 				if note_result == NoteResult.Perfect then
 					if params.IsHeldNoteBegin == true then
-						_game._audio_manager._hit_sfx_group:play_first()
+						_game._audio_manager:get_hit_sfx_group():play_first()
 					else
-						_game._audio_manager._hit_sfx_group:play_alternating()
+						_game._audio_manager:get_hit_sfx_group():play_alternating()
 					end
 
 				elseif note_result == NoteResult.Great then
-					_game._audio_manager._hit_sfx_group:play_first()
+					_game._audio_manager.get_hit_sfx_group():play_first()
 				elseif note_result == NoteResult.Okay then
 					_game._sfx_manager:play_sfx(SFXManager.SFX_DRUM_OKAY)
 				else

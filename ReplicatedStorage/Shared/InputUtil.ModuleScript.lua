@@ -8,27 +8,7 @@ InputUtil.KEY_TRACK2 = 1
 InputUtil.KEY_TRACK3 = 2
 InputUtil.KEY_TRACK4 = 3
 
-InputUtil.KEY_UP = 10
-InputUtil.KEY_DOWN = 11
-InputUtil.KEY_LEFT = 12
-InputUtil.KEY_RIGHT = 13
-
-InputUtil.KEY_MOD1 = 21
-
-InputUtil.KEY_MENU_OPEN = 31
-InputUtil.KEY_MENU_ENTER = 32
-InputUtil.KEY_MENU_BACK = 33
-
-InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS = 34
-InputUtil.KEY_MENU_SPUITEXTINPUT_ESC = 35
-
 InputUtil.KEY_CLICK = 41
-
-InputUtil.KEY_SCROLL_UP = 51
-InputUtil.KEY_SCROLL_DOWN = 52
-
-InputUtil.KEY_DEBUG_1 = -5
-InputUtil.KEY_DEBUG_2 = -6
 
 InputUtil.KEYCODE_TOUCH_TRACK1 = 10001
 InputUtil.KEYCODE_TOUCH_TRACK2 = 10002
@@ -101,12 +81,6 @@ function InputUtil:new()
 
 			end
 		end)
-		game.Players.LocalPlayer:GetMouse().WheelForward:connect(function()
-			self:input_began(InputUtil.KEY_SCROLL_UP)
-		end)
-		game.Players.LocalPlayer:GetMouse().WheelBackward:connect(function()
-			self:input_began(InputUtil.KEY_SCROLL_DOWN)
-		end)
 	end
 
 	function self:input_began(keycode)
@@ -122,13 +96,7 @@ function InputUtil:new()
 	function self:post_update()
 		_just_pressed_keys:clear()
 		_just_released_keys:clear()
-
-		if _down_keys:contains(InputUtil.KEY_SCROLL_UP) then
-			self:input_ended(InputUtil.KEY_SCROLL_UP)
-		end
-		if _down_keys:contains(InputUtil.KEY_SCROLL_DOWN) then
-			self:input_ended(InputUtil.KEY_SCROLL_DOWN)
-		end
+		
 		if _do_textbox_unfocus == true then
 			_do_textbox_unfocus = false
 			_textbox_focused = false
@@ -136,11 +104,6 @@ function InputUtil:new()
 	end
 
 	local function is_control_active(control,active_dict)
-
-		if control == InputUtil.KEY_CLICK then
-			return active_dict:contains(InputUtil.KEY_CLICK)
-		end
-
 		if _textbox_focused == true then
 			return false
 		end
@@ -188,54 +151,6 @@ function InputUtil:new()
 				active_dict:contains(Enum.KeyCode.P) or
 				active_dict:contains(Enum.KeyCode.Period) or
 				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4)
-
-		elseif control == InputUtil.KEY_DOWN then
-			return active_dict:contains(Enum.KeyCode.Down) or
-				active_dict:contains(Enum.KeyCode.S) or
-				active_dict:contains(Enum.KeyCode.Tab)
-
-		elseif control == InputUtil.KEY_UP then
-			return active_dict:contains(Enum.KeyCode.Up) or
-				active_dict:contains(Enum.KeyCode.W)
-
-		elseif control == InputUtil.KEY_LEFT then
-			return active_dict:contains(Enum.KeyCode.Left) or active_dict:contains(Enum.KeyCode.A)
-
-		elseif control == InputUtil.KEY_RIGHT then
-			return active_dict:contains(Enum.KeyCode.Right) or active_dict:contains(Enum.KeyCode.D)
-
-		elseif control == InputUtil.KEY_MOD1 then
-			return active_dict:contains(Enum.KeyCode.LeftShift)
-
-		elseif control == InputUtil.KEY_MENU_OPEN then
-			return active_dict:contains(Enum.KeyCode.Return)
-
-		elseif control == InputUtil.KEY_MENU_ENTER then
-			return (active_dict:contains(Enum.KeyCode.Return) and _textbox_focused == false)
-				or active_dict:contains(Enum.KeyCode.Space)
-
-		elseif control == InputUtil.KEY_MENU_BACK then
-			return active_dict:contains(Enum.KeyCode.Backspace)
-
-		elseif control == InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS then
-			return active_dict:contains(Enum.KeyCode.Period)
-
-		elseif control == InputUtil.KEY_MENU_SPUITEXTINPUT_ESC then
-			return active_dict:contains(Enum.KeyCode.Escape)
-
-		elseif control == InputUtil.KEY_SCROLL_UP then
-			return active_dict:contains(InputUtil.KEY_SCROLL_UP)
-
-		elseif control == InputUtil.KEY_SCROLL_DOWN then
-			return active_dict:contains(InputUtil.KEY_SCROLL_DOWN)
-
-		elseif control == InputUtil.KEY_DEBUG_1 then
-			return false
-			--return active_dict:contains(Enum.KeyCode.Q) and active_dict:contains(Enum.KeyCode.P)
-
-		elseif control == InputUtil.KEY_DEBUG_2 then
-			return false
-			--active_dict:contains(Enum.KeyCode.Two)
 
 		else
 			error("INPUTKEY NOT FOUND ",control)
