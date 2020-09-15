@@ -54,7 +54,7 @@ function AudioManager:new(_game)
 	local _post_finish_wait_time_ms = game.Workspace.Settings.PostFinishWaitTimeMS.Value --Default:300
 
 	--Audio offset is milliseconds
-	local _audio_time_offset = 0
+	local _audio_time_offset = game.Workspace.Settings.AudioOffset.Value
 	
 	--The game audio
 	local _bgm = Instance.new("Sound", EnvironmentSetup:get_local_elements_folder())
