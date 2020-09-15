@@ -8,11 +8,15 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local SongStartMenu = require(game.ReplicatedStorage.Menus.SongStartMenu)
 local ConfirmationPopupMenu = require(game.ReplicatedStorage.Menus.ConfirmationPopupMenu)
 
+--local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
+
 local SongSelectMenu = {}
 
 function SongSelectMenu:new(_local_services)
 	local self = MenuBase:new()
 	
+	local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
+
 	local _song_select_ui
 	local _selected_songkey = SongDatabase:invalid_songkey()
 	local _is_supporter = false
@@ -62,6 +66,10 @@ function SongSelectMenu:new(_local_services)
 		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", game.Workspace.Settings.CreatorName.Value)
 		_song_select_ui.GamepassButton.Activated:Connect(function()
 			self:show_gamepass_menu()
+		end)
+
+		_song_select_ui.SettingsButton.MouseButton1Click:Connect(function()
+			_local_services._menus:push_menu(SettingsMenu:new(_local_services))
 		end)
 		
 		MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, asset_id, is_purchased)
