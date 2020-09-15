@@ -7,17 +7,22 @@
       "$className": "ReplicatedStorage",
       "$path": "ReplicatedStorage"
     },
-
-    "ServerScriptService": {
-      "$className": "ServerScriptService"
-    },
-
     "StarterPlayer": {
-      "$className": "StarterPlayer"
+      "$className": "StarterPlayer",
+      "$path": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$path": "StarterPlayer/StarterPlayerScripts"
+      },
+      "StarterCharacterScripts": {
+        "$className": "StarterCharacterScripts",
+        "$path": "StarterPlayer/StarterCharacterScripts"
+      }
     },
 
     "Workspace": {
       "$className": "Workspace",
+      "$path": "Workspace",
       "$properties": {
         "FilteringEnabled": true
       }
