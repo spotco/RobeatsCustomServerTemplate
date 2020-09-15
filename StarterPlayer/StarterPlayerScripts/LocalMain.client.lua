@@ -19,8 +19,8 @@ local function game_init()
 		_menus = MenuSystem:new();
 	}
 	
-	local_services._menus:push_menu(SettingsMenu:new())
-	
+	local_services._menus:push_menu(SettingsMenu:new(local_services))
+
 	local update_connection
 	update_connection = game:GetService("RunService").Heartbeat:Connect(function(tick_delta)
 		local success, err = SPUtil:try(function()
