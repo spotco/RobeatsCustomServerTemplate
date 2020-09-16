@@ -57,13 +57,13 @@ function SettingsMenu:new(_local_services)
 		end)
 
 		back.MouseButton1Click:Connect(function()
-			_local_services._menus:push_menu(SongSelectMenu:new(_local_services))
+			back_hit = true
 		end)
 
 		for i, v in pairs(keybinds:GetChildren()) do
 			if v:IsA("TextButton") then
 				v.MouseButton1Click:Connect(function()
-					
+					print("CRINGE ASS MOTHERFUCKER")
 				end)
 			end
 		end
@@ -81,7 +81,7 @@ function SettingsMenu:new(_local_services)
 	end
 	
 	--[[Override--]] function self:do_remove()
-		
+		_local_services._menus:push_menu(SongSelectMenu:new(_local_services))
 	end
 
 	--[[Override--]] function self:set_is_top_element(val)
