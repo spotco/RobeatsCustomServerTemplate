@@ -6,6 +6,8 @@ local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
 local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
 
+local UserInputService = game:GetService("UserInputService")
+
 local SongSelectMenu = require(game.ReplicatedStorage.Menus.SongSelectMenu)
 
 function SettingsMenu:new(_local_services)
@@ -63,7 +65,11 @@ function SettingsMenu:new(_local_services)
 		for i, v in pairs(keybinds:GetChildren()) do
 			if v:IsA("TextButton") then
 				v.MouseButton1Click:Connect(function()
-					print("CRINGE ASS MOTHERFUCKER")
+					local u = UserInputService.InputBegan:Wait()
+					local k = u.KeyCode
+					v.Text = k.Name
+
+					
 				end)
 			end
 		end
