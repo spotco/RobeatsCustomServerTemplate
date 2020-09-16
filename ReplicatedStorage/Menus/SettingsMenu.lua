@@ -60,6 +60,14 @@ function SettingsMenu:new(_local_services)
 			_local_services._menus:push_menu(SongSelectMenu:new(_local_services))
 		end)
 
+		for i, v in pairs(keybinds:GetChildren()) do
+			if v:IsA("TextButton") then
+				v.MouseButton1Click:Connect(function()
+					
+				end)
+			end
+		end
+
 		updateNSMULT()
 		updateADOFFSET()
 	end
