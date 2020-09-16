@@ -24,19 +24,21 @@ AudioManager.Mode = {
 
 function AudioManager:new(_game)
 	local self = {}
+
+	local _configuration = require(game.ReplicatedStorage.Configuration)
 	
 	--Note speed in milliseconds, from time it takes to spawn the note to time the note is hit. Default value is 1500, or 1.5 seconds.
-	--To add a multiplier to this, set game.Workspace.Settings.NoteSpeedMultiplier.Value
+	--To add a multiplier to this, set _configuration.NoteSpeedMultiplier
 	local _note_prebuffer_time = 0
 	function self:get_note_prebuffer_time_ms() return _note_prebuffer_time end
 	
 	--Note timings: millisecond offset (positive is early, negative is late) mapping to what the note result is
-	local _note_okay_max = game.Workspace.Settings.NoteOkayMaxMS.Value --Default: 260
-	local _note_great_max = game.Workspace.Settings.NoteGreatMaxMS.Value --Default: 140
-	local _note_perfect_max = game.Workspace.Settings.NotePerfectMaxMS.Value --Default: 40
-	local _note_perfect_min = game.Workspace.Settings.NotePerfectMinMS.Value --Default: -20
-	local _note_great_min = game.Workspace.Settings.NoteGreatMinMS.Value --Default: -70
-	local _note_okay_min = game.Workspace.Settings.NoteOkayMinMS.Value --Default: -140
+	local _note_okay_max = _configuration.NoteOkayMaxMS --Default: 260
+	local _note_great_max = _configuration.NoteGreatMaxMS --Default: 140
+	local _note_perfect_max = _configuration.NotePerfectMaxMS --Default: 40
+	local _note_perfect_min = _configuration.NotePerfectMinMS --Default: -20
+	local _note_great_min = _configuration.NoteGreatMinMS --Default: -70
+	local _note_okay_min = _configuration.NoteOkayMinMS --Default: -140
 	
 	--Called in NoteResult:timedelta_to_result(time_to_end, _game)
 	function self:get_note_result_timing()
@@ -44,17 +46,17 @@ function AudioManager:new(_game)
 	end
 	
 	--Time in milliseconds after note expected hit time to remove note (and do a Time miss)
-	local _note_remove_time = game.Workspace.Settings.NoteRemoveTimeMS.Value --Default: -200
+	local _note_remove_time = _configuration.NoteRemoveTimeMS --Default: -200
 	function self:get_note_remove_time() return _note_remove_time end
 	
 	--Time in milliseconds countdown will take
-	local _pre_countdown_time_ms = game.Workspace.Settings.PreStartCountdownTimeMS.Value --Default: 3000
+	local _pre_countdown_time_ms = _configuration.PreStartCountdownTimeMS --Default: 3000
 	
 	--Time in milliseconds to wait after game finishes to end
-	local _post_finish_wait_time_ms = game.Workspace.Settings.PostFinishWaitTimeMS.Value --Default:300
+	local _post_finish_wait_time_ms = _configuration.PostFinishWaitTimeMS --Default:300
 
 	--Audio offset is milliseconds
-	local _audio_time_offset = game.Workspace.Settings.AudioOffset.Value
+	local _audio_time_offset = _configuration.AudioOffset
 	
 	--The game audio
 	local _bgm = Instance.new("Sound", EnvironmentSetup:get_local_elements_folder())
@@ -117,7 +119,7 @@ function AudioManager:new(_game)
 		end
 		
 		--Apply note speed multiplier
-		_note_prebuffer_time = _current_audio_data.AudioNotePrebufferTime * game.Workspace.Settings.NoteSpeedMultiplier.Value
+		_note_prebuffer_time = _current_audio_data.AudioNotePrebufferTime * _configuration.NoteSpeedMultiplier
 	end
 
 	function self:teardown()
