@@ -17,6 +17,8 @@ function SongSelectMenu:new(_local_services)
 	
 	local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
 
+	local _configuration  = require(game.ReplicatedStorage.Configuration)
+
 	local _song_select_ui
 	local _selected_songkey = SongDatabase:invalid_songkey()
 	local _is_supporter = false
@@ -63,7 +65,7 @@ function SongSelectMenu:new(_local_services)
 				game:GetService("TeleportService"):Teleport(698448212)
 			end))
 		end)
-		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", game.Workspace.Settings.CreatorName.Value)
+		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", _configuration.CreatorName)
 		_song_select_ui.GamepassButton.Activated:Connect(function()
 			self:show_gamepass_menu()
 		end)
@@ -73,7 +75,7 @@ function SongSelectMenu:new(_local_services)
 		end)
 		
 		MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, asset_id, is_purchased)
-			if asset_id == game.Workspace.Settings.SupporterGamepassID.Value and is_purchased == true then
+			if asset_id == _configuration.SupporterGamepassID and is_purchased == true then
 				_is_supporter = true
 				self:select_songkey(_selected_songkey)
 				self:show_gamepass_menu()
@@ -81,7 +83,7 @@ function SongSelectMenu:new(_local_services)
 		end)
 		
 		spawn(function()
-			_is_supporter = MarketplaceService:UserOwnsGamePassAsync(game.Players.LocalPlayer.UserId, game.Workspace.Settings.SupporterGamepassID.Value)
+			_is_supporter = MarketplaceService:UserOwnsGamePassAsync(game.Players.LocalPlayer.UserId, _configuration.SupporterGamepassID)
 			self:select_songkey(_selected_songkey)
 		end)
 	end
@@ -89,17 +91,17 @@ function SongSelectMenu:new(_local_services)
 	function self:show_gamepass_menu()
 		if _is_supporter then
 			_local_services._menus:push_menu(ConfirmationPopupMenu:new(_local_services, 
-				string.format("You are supporting %s!", game.Workspace.Settings.CreatorName.Value), 
+				string.format("You are supporting %s!", _configuration.CreatorName), 
 				"Thank you for supporting this creator!", 
 				function() end):hide_back_button()
 			)
 		else
 			_local_services._menus:push_menu(ConfirmationPopupMenu:new(
 				_local_services, 
-				string.format("Support %s!", game.Workspace.Settings.CreatorName.Value), 
+				string.format("Support %s!", _configuration.CreatorName), 
 				"Roblox audios are expensive to upload!\nHelp this creator by buying the Supporter Game Pass.\nBy becoming a supporter, you will get access to every song they create!", 
 				function()
-					MarketplaceService:PromptGamePassPurchase(game.Players.LocalPlayer, game.Workspace.Settings.SupporterGamepassID.Value)
+					MarketplaceService:PromptGamePassPurchase(game.Players.LocalPlayer, _configuration.SupporterGamepassID)
 				end)
 			)
 		end

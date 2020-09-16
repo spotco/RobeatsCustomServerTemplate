@@ -15,7 +15,7 @@ function SettingsMenu:new(_local_services)
 	
 	local back_hit = false
 
-	local settings = workspace.Settings
+	local _configuration = require(game.ReplicatedStorage.Configuration)
 
 	local _settings_ui
 	
@@ -27,34 +27,34 @@ function SettingsMenu:new(_local_services)
 		local back = _settings_ui.Back
 
 		local function updateNSMULT()
-			notespeed.Display.Text = 1/settings.NoteSpeedMultiplier.Value
+			notespeed.Display.Text = 1/_configuration.NoteSpeedMultiplier
 		end
 
 		local function updateADOFFSET()
-			offset.Display.Text = settings.AudioOffset.Value
+			offset.Display.Text = _configuration.AudioOffset
 		end
 
 		--TODO: CLEAN THIS UP
 
 		--//NOTESPEED
 		notespeed.Minus.MouseButton1Click:Connect(function()
-			settings.NoteSpeedMultiplier.Value = settings.NoteSpeedMultiplier.Value + 0.1
+			_configuration.NoteSpeedMultiplier = _configuration.NoteSpeedMultiplier + 0.1
 			updateNSMULT()
 		end)
 
 		notespeed.Plus.MouseButton1Click:Connect(function()
-			settings.NoteSpeedMultiplier.Value = settings.NoteSpeedMultiplier.Value - 0.1
+			_configuration.NoteSpeedMultiplier = _configuration.NoteSpeedMultiplier - 0.1
 			updateNSMULT()
 		end)
 
 		--//OFFSET
 		offset.Minus.MouseButton1Click:Connect(function()
-			settings.AudioOffset.Value = settings.AudioOffset.Value - 5
+			_configuration.AudioOffset = _configuration.AudioOffset - 5
 			updateADOFFSET()
 		end)
 
 		offset.Plus.MouseButton1Click:Connect(function()
-			settings.AudioOffset.Value = settings.AudioOffset.Value + 5
+			_configuration.AudioOffset = _configuration.AudioOffset + 5
 			updateADOFFSET()
 		end)
 
@@ -69,7 +69,7 @@ function SettingsMenu:new(_local_services)
 					local k = u.KeyCode
 					v.Text = k.Name
 
-					
+
 				end)
 			end
 		end
