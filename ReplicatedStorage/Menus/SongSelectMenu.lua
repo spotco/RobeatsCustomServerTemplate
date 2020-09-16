@@ -48,7 +48,7 @@ function SongSelectMenu:new(_local_services)
 			end
 			
 			itr_list_element.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 then
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					self:select_songkey(itr_songkey)
 				end
 			end)
