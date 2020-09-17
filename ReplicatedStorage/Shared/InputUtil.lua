@@ -461,13 +461,13 @@ function InputUtil:new()
 		elseif key == InputUtil.KEY_CHAT_WINDOW_FOCUS then
 			return "/"
 		elseif key == InputUtil.KEY_TRACK1 then
-			return "A/J/Q/U/1"
+			return "X"
 		elseif key == InputUtil.KEY_TRACK2 then
-			return "S/K/W/I/2"
+			return "C"
 		elseif key == InputUtil.KEY_TRACK3 then
-			return "D/L/E/O/3"
+			return ","
 		elseif key == InputUtil.KEY_TRACK4 then
-			return "F/;/R/P/4"
+			return "."
 		elseif key == InputUtil.KEY_POWERBAR_TRIGGER then
 			return "Space"
 		else
