@@ -20,4 +20,12 @@ local config = {
     }
 }
 
-return config
+local Configuration = {
+    preferences = config
+}
+
+function Configuration:modify(key, value)
+    self.preferences[key] = value
+end
+
+return Configuration
