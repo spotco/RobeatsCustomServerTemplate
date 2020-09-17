@@ -95,4 +95,42 @@ function SPUtil:look_at(eye, target)
 	return CFrame.fromMatrix(eye, rightVector, upVector2)
 end
 
+function SPUtil:is_mobile()
+	return game:GetService("UserInputService").TouchEnabled
+end
+
+local _sputil_screengui = nil
+local function verify_sputil_screengui()
+	if _sputil_screengui ~= nil then return true end
+	if game.Players.LocalPlayer == nil then
+		return false
+	end
+	if game.Players.LocalPlayer:FindFirstChild("PlayerGui") == nil then
+		return false
+	end
+	local TESTGUI_NAME = "SPUtil_test"
+	if game.Players.LocalPlayer.PlayerGui:FindFirstChild(TESTGUI_NAME) == nil then
+		_sputil_screengui = Instance.new("ScreenGui",game.Players.LocalPlayer.PlayerGui)
+		_sputil_screengui.Name = TESTGUI_NAME
+		_sputil_screengui.ResetOnSpawn = false
+	end
+	return true
+end
+
+function SPUtil:topbar_size() return 36 end
+
+local __cached_screen_size = Vector2.new(0,0)
+local __cached_absolute_size = Vector2.new()
+function SPUtil:screen_size()
+	if verify_sputil_screengui() == false then
+		return __cached_screen_size
+	end
+	local abs_size = _sputil_screengui.AbsoluteSize
+	if __cached_absolute_size ~= abs_size then
+		__cached_absolute_size = abs_size
+		__cached_screen_size = Vector2.new(abs_size.X + 0, abs_size.Y + SPUtil:topbar_size())
+	end
+	return __cached_screen_size
+end
+
 return SPUtil
