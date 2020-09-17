@@ -61,16 +61,9 @@ function InputUtil:new()
 	local _has_recorded_keycode_input = false
 	local _recorded_keycode = 0
 
-	local _configuration = require(game.ReplicatedStorage.Configuration)
+	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
 
 	local _custom_binds = _configuration.Keybinds
-
-	local _custom_key_keycode = SPDict:new()
-
-	_custom_key_keycode:add(InputUtil.KEY_TRACK1, _custom_binds[1])
-	_custom_key_keycode:add(InputUtil.KEY_TRACK2, _custom_binds[2])
-	_custom_key_keycode:add(InputUtil.KEY_TRACK3, _custom_binds[3])
-	_custom_key_keycode:add(InputUtil.KEY_TRACK4, _custom_binds[4])
 
 	function self:cons()
 		
@@ -286,43 +279,29 @@ function InputUtil:new()
 		end
 
 		if control == InputUtil.KEY_TRACK1 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK1) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK1))
-			end
 			return active_dict:contains(Enum.KeyCode.X) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1)
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1) or
+				active_dict:contains(_custom_binds[1])
 
 		elseif control == InputUtil.KEY_TRACK2 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK2) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK2))
-			end
 			return active_dict:contains(Enum.KeyCode.C) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2)
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2) or
+				active_dict:contains(_custom_binds[2])
 
 		elseif control == InputUtil.KEY_TRACK3 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK3) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK3))
-			end
 			return active_dict:contains(Enum.KeyCode.Comma) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3)
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3) or
+				active_dict:contains(_custom_binds[3])
 
 		elseif control == InputUtil.KEY_TRACK4 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK4) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK4))
-			end
 			return active_dict:contains(Enum.KeyCode.Period)	or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4)
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4) or
+				active_dict:contains(_custom_binds[4])
 
 		elseif control == InputUtil.KEY_POWERBAR_TRIGGER then
-			if _custom_key_keycode:contains(InputUtil.KEY_POWERBAR_TRIGGER) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_POWERBAR_TRIGGER))
-			end
 			return active_dict:contains(Enum.KeyCode.Space)
 
 		elseif control == InputUtil.KEY_GAME_QUIT then
-			if _custom_key_keycode:contains(InputUtil.KEY_GAME_QUIT) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_GAME_QUIT))
-			end
 			return active_dict:contains(Enum.KeyCode.Backspace)
 
 		elseif control == InputUtil.KEY_DOWN then
@@ -357,15 +336,9 @@ function InputUtil:new()
 			return active_dict:contains(Enum.KeyCode.Backspace)
 
 		elseif control == InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS then
-			if _custom_key_keycode:contains(InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS)) and (_textbox_focused == false)
-			end
 			return active_dict:contains(Enum.KeyCode.Period) and (_textbox_focused == false)
 
 		elseif control == InputUtil.KEY_CHAT_WINDOW_FOCUS then
-			if _custom_key_keycode:contains(InputUtil.KEY_CHAT_WINDOW_FOCUS) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_CHAT_WINDOW_FOCUS)) and (_textbox_focused == false)
-			end
 			return active_dict:contains(Enum.KeyCode.Slash) and (_textbox_focused == false)
 
 		elseif control == InputUtil.KEY_MENU_SPUITEXTINPUT_ESC then
@@ -404,7 +377,6 @@ function InputUtil:new()
 		else
 			error("INPUTKEY NOT FOUND ",control)
 			return false
-
 		end
 	end
 
