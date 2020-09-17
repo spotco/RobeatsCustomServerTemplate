@@ -25,7 +25,7 @@ AudioManager.Mode = {
 function AudioManager:new(_game)
 	local self = {}
 
-	local _configuration = require(game.ReplicatedStorage.Configuration)
+	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
 	
 	--Note speed in milliseconds, from time it takes to spawn the note to time the note is hit. Default value is 1500, or 1.5 seconds.
 	--To add a multiplier to this, set _configuration.NoteSpeedMultiplier

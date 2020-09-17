@@ -27,34 +27,34 @@ function SettingsMenu:new(_local_services)
 		local back = _settings_ui.Back
 
 		local function updateNSMULT()
-			notespeed.Display.Text = 1/_configuration.NoteSpeedMultiplier
+			notespeed.Display.Text = 1/_configuration.preferences.NoteSpeedMultiplier
 		end
 
 		local function updateADOFFSET()
-			offset.Display.Text = _configuration.AudioOffset
+			offset.Display.Text = _configuration.preferences.AudioOffset
 		end
 
 		--TODO: CLEAN THIS UP
 
 		--//NOTESPEED
 		notespeed.Minus.MouseButton1Click:Connect(function()
-			_configuration.NoteSpeedMultiplier = _configuration.NoteSpeedMultiplier + 0.1
+			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier + 0.1
 			updateNSMULT()
 		end)
 
 		notespeed.Plus.MouseButton1Click:Connect(function()
-			_configuration.NoteSpeedMultiplier = _configuration.NoteSpeedMultiplier - 0.1
+			_configuration.preferences.NoteSpeedMultiplier = _configuration.Npreferences.oteSpeedMultiplier - 0.1
 			updateNSMULT()
 		end)
 
 		--//OFFSET
 		offset.Minus.MouseButton1Click:Connect(function()
-			_configuration.AudioOffset = _configuration.AudioOffset - 5
+			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset - 5
 			updateADOFFSET()
 		end)
 
 		offset.Plus.MouseButton1Click:Connect(function()
-			_configuration.AudioOffset = _configuration.AudioOffset + 5
+			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset + 5
 			updateADOFFSET()
 		end)
 
@@ -62,14 +62,18 @@ function SettingsMenu:new(_local_services)
 			back_hit = true
 		end)
 
-		for i, v in pairs(keybinds:GetChildren()) do
+		local itr_i = 0
+
+		for _, v in pairs(keybinds:GetChildren()) do
 			if v:IsA("TextButton") then
+				itr_i += 1
+				local p_i = itr_i
 				v.MouseButton1Click:Connect(function()
+					local i = p_i
 					local u = UserInputService.InputBegan:Wait()
 					local k = u.KeyCode
 					v.Text = k.Name
-
-
+					_configuration.preferences.Keybinds[i] = k
 				end)
 			end
 		end
