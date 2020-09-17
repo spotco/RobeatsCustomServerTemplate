@@ -280,44 +280,28 @@ function InputUtil:new()
 			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK1) then
 				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK1))
 			end
-			return active_dict:contains(Enum.KeyCode.A) or
-				active_dict:contains(Enum.KeyCode.J) or
-				active_dict:contains(Enum.KeyCode.One) or
-				active_dict:contains(Enum.KeyCode.Q) or
-				active_dict:contains(Enum.KeyCode.U) or
+			return active_dict:contains(Enum.KeyCode.X) or
 				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1)
 
 		elseif control == InputUtil.KEY_TRACK2 then
 			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK2) then
 				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK2))
 			end
-			return active_dict:contains(Enum.KeyCode.S) or
-				active_dict:contains(Enum.KeyCode.K) or
-				active_dict:contains(Enum.KeyCode.Two) or
-				active_dict:contains(Enum.KeyCode.W) or
-				active_dict:contains(Enum.KeyCode.I) or
+			return active_dict:contains(Enum.KeyCode.C) or
 				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2)
 
 		elseif control == InputUtil.KEY_TRACK3 then
 			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK3) then
 				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK3))
 			end
-			return active_dict:contains(Enum.KeyCode.D) or
-				active_dict:contains(Enum.KeyCode.L) or
-				active_dict:contains(Enum.KeyCode.Three) or
-				active_dict:contains(Enum.KeyCode.E) or
-				active_dict:contains(Enum.KeyCode.O) or
+			return active_dict:contains(Enum.KeyCode.Comma) or
 				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3)
 
 		elseif control == InputUtil.KEY_TRACK4 then
 			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK4) then
 				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK4))
 			end
-			return active_dict:contains(Enum.KeyCode.F)	or
-				active_dict:contains(Enum.KeyCode.Semicolon) or
-				active_dict:contains(Enum.KeyCode.Four) or
-				active_dict:contains(Enum.KeyCode.R) or
-				active_dict:contains(Enum.KeyCode.P) or
+			return active_dict:contains(Enum.KeyCode.Period)	or
 				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4)
 
 		elseif control == InputUtil.KEY_POWERBAR_TRIGGER then
