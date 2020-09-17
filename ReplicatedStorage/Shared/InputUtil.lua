@@ -61,7 +61,16 @@ function InputUtil:new()
 	local _has_recorded_keycode_input = false
 	local _recorded_keycode = 0
 
+	local _configuration = require(game.ReplicatedStorage.Configuration)
+
+	local _custom_binds = _configuration.Keybinds
+
 	local _custom_key_keycode = SPDict:new()
+
+	_custom_key_keycode:add(InputUtil.KEY_TRACK1, _custom_binds[1])
+	_custom_key_keycode:add(InputUtil.KEY_TRACK2, _custom_binds[2])
+	_custom_key_keycode:add(InputUtil.KEY_TRACK3, _custom_binds[3])
+	_custom_key_keycode:add(InputUtil.KEY_TRACK4, _custom_binds[4])
 
 	function self:cons()
 		

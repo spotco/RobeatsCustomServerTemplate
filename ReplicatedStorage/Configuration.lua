@@ -12,6 +12,12 @@ local config = {
     PostFinishWaitTimeMS = 300;
     PreStartCountdownTimeMS = 3000;
     SupporterGamepassID = 11742318;
+    Keybinds = {
+        Enum.KeyCode.Q,
+        Enum.KeyCode.W,
+        Enum.KeyCode.O,
+        Enum.KeyCode.P
+    }
 }
 
 return config
