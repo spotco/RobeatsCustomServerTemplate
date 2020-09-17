@@ -74,6 +74,12 @@ function SingleNote:new(_game, _track_index, _slot_index, _creation_time_ms, _hi
 			parent_track:get_end_position(),
 			_t
 		)
+		--Magic number! Set Y position of single note to look good lined up against held note beginning/ends
+		_position = Vector3.new(
+			_position.X,
+			0.25 + _game:get_game_environment_center_position().Y,
+			_position.Z
+		)
 		
 		--Note scales in size from spawn (t=0, scale is 0.25) to deletion (t=1, scale is 0.925)
 		local size = CurveUtil:YForPointOf2PtLine(
