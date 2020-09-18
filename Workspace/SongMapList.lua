@@ -1,4 +1,1 @@
-return {
-	game.ReplicatedStorage.SongMaps.MondayNightMonstersNormal, --Song Key: 1
-	game.ReplicatedStorage.SongMaps.MondayNightMonstersHard, --Song Key: 2
-}
+return game.ReplicatedStorage.SongMaps:GetChildren()
