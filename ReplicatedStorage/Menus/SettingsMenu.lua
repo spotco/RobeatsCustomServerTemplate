@@ -29,7 +29,7 @@ function SettingsMenu:new(_local_services)
 		local back = _settings_ui.Back
 
 		local function updateNSMULT()
-			notespeed.Display.Text = 1/_configuration.preferences.NoteSpeedMultiplier
+			notespeed.Display.Text = _configuration.preferences.NoteSpeedMultiplier
 		end
 
 		local function updateADOFFSET()
@@ -40,23 +40,23 @@ function SettingsMenu:new(_local_services)
 
 		--//NOTESPEED
 		_input:bind_input_fire(notespeed.Minus, function()
-			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier + 0.1
+			_configuration.preferences.NoteSpeedMultiplier -= 0.1
 			updateNSMULT()
 		end)
 
 		_input:bind_input_fire(notespeed.Plus, function()
-			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier - 0.1
+			_configuration.preferences.NoteSpeedMultiplier += 0.1
 			updateNSMULT()
 		end)
 
 		--//OFFSET
 		_input:bind_input_fire(offset.Minus, function()
-			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset - 5
+			_configuration.preferences.AudioOffset -= 5
 			updateADOFFSET()
 		end)
 
 		_input:bind_input_fire(offset.Plus, function()
-			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset + 5
+			_configuration.preferences.AudioOffset += 5
 			updateADOFFSET()
 		end)
 
