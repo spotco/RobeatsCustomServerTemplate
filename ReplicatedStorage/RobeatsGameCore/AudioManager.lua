@@ -119,7 +119,7 @@ function AudioManager:new(_game)
 		end
 		
 		--Apply note speed multiplier
-		_note_prebuffer_time = _current_audio_data.AudioNotePrebufferTime * _configuration.NoteSpeedMultiplier
+		_note_prebuffer_time = _current_audio_data.AudioNotePrebufferTime / _configuration.NoteSpeedMultiplier
 	end
 
 	function self:teardown()
