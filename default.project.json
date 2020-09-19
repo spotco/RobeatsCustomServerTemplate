@@ -20,6 +20,11 @@
       }
     },
 
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$path": "ServerScriptService"
+    },
+
     "Workspace": {
       "$className": "Workspace",
       "$path": "Workspace",
