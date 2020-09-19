@@ -45,7 +45,7 @@ function SettingsMenu:new(_local_services)
 		end)
 
 		_input:bind_input_fire(notespeed.Plus, function()
-			_configuration.preferences.NoteSpeedMultiplier = _configuration.Npreferences.oteSpeedMultiplier - 0.1
+			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier - 0.1
 			updateNSMULT()
 		end)
 
