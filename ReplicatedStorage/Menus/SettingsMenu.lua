@@ -70,6 +70,8 @@ function SettingsMenu:new(_local_services)
 			if v:IsA("TextButton") then
 				itr_i += 1
 				local p_i = itr_i
+				-- GO AHEAD AND SET THE TEXT TO THE PROPER KEYCODE ON INITIALIZATION
+				v.Text = _configuration.preferences.Keybinds[p_i].Name
 				_input:bind_input_fire(v, function()
 					local i = p_i
 					local u = UserInputService.InputBegan:Wait()
