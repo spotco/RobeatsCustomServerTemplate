@@ -186,6 +186,20 @@ function InputUtil:new()
 		nearest_touch:set(x,y)
 	end
 
+	function self:bind_input_fire(object_, callback_)
+		local cb = function(i,n)
+			if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+				callback_(i,n)
+			end
+		end
+		local suc, err = pcall(function()
+			object_.Activated:Connect(cb)
+		end)
+		if not suc then
+			object_.InputBegan:Connect(cb)
+		end
+	end
+
 	function self:touch_ended(x,y)
 		local touch_ended_spvec = SPVector:new(x,y)
 		local nearest_touch, i_nearest_touch = get_nearest_touch(touch_ended_spvec)
