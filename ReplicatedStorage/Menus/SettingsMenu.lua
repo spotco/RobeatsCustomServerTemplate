@@ -17,6 +17,8 @@ function SettingsMenu:new(_local_services)
 
 	local _configuration = require(game.ReplicatedStorage.Configuration)
 
+	local _input = _local_services._input
+
 	local _settings_ui
 	
 	function self:cons()
@@ -37,28 +39,28 @@ function SettingsMenu:new(_local_services)
 		--TODO: CLEAN THIS UP
 
 		--//NOTESPEED
-		notespeed.Minus.MouseButton1Click:Connect(function()
+		_input:bind_input_fire(notespeed.Minus, function()
 			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier + 0.1
 			updateNSMULT()
 		end)
 
-		notespeed.Plus.MouseButton1Click:Connect(function()
+		_input:bind_input_fire(notespeed.Plus, function()
 			_configuration.preferences.NoteSpeedMultiplier = _configuration.Npreferences.oteSpeedMultiplier - 0.1
 			updateNSMULT()
 		end)
 
 		--//OFFSET
-		offset.Minus.MouseButton1Click:Connect(function()
+		_input:bind_input_fire(offset.Minus, function()
 			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset - 5
 			updateADOFFSET()
 		end)
 
-		offset.Plus.MouseButton1Click:Connect(function()
+		_input:bind_input_fire(offset.Plus, function()
 			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset + 5
 			updateADOFFSET()
 		end)
 
-		back.MouseButton1Click:Connect(function()
+		_input:bind_input_fire(back, function()
 			back_hit = true
 		end)
 
@@ -68,7 +70,7 @@ function SettingsMenu:new(_local_services)
 			if v:IsA("TextButton") then
 				itr_i += 1
 				local p_i = itr_i
-				v.MouseButton1Click:Connect(function()
+				_input:bind_input_fire(v, function()
 					local i = p_i
 					local u = UserInputService.InputBegan:Wait()
 					local k = u.KeyCode

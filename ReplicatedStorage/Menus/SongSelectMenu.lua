@@ -22,6 +22,8 @@ function SongSelectMenu:new(_local_services)
 	local _song_select_ui
 	local _selected_songkey = SongDatabase:invalid_songkey()
 	local _is_supporter = false
+
+	local _input = _local_services._input
 	
 	function self:cons()
 		_song_select_ui = EnvironmentSetup:get_menu_protos_folder().SongSelectUI:Clone()
@@ -47,33 +49,33 @@ function SongSelectMenu:new(_local_services)
 				itr_list_element.DifficultyDisplay.Text = itr_list_element.DifficultyDisplay.Text .. " (Supporter Only)"
 			end
 			
-			itr_list_element.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					self:select_songkey(itr_songkey)
-				end
+			_input:bind_input_fire(itr_list_element, function(input)
+				self:select_songkey(itr_songkey)
 			end)
 		end
 		
 		_song_select_ui.SongInfoSection.Visible = false
 		_song_select_ui.PlayButton.Visible = false
-		_song_select_ui.PlayButton.Activated:Connect(function()
+
+		_input:bind_input_fire(_song_select_ui.PlayButton, function()
 			self:play_button_pressed()
 		end)
-		_song_select_ui.NoSongSelectedDisplay.Visible = true
-		_song_select_ui.RobeatsLogo.Activated:Connect(function()
+		
+		_input:bind_input_fire(_song_select_ui.RobeatsLogo, function()
 			_local_services._menus:push_menu(ConfirmationPopupMenu:new(_local_services, "Teleport to Robeats?", "Do you want to go to Robeats?", function()
 				game:GetService("TeleportService"):Teleport(698448212)
 			end))
 		end)
-		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", _configuration.CreatorName)
-		_song_select_ui.GamepassButton.Activated:Connect(function()
+		_input:bind_input_fire(_song_select_ui.GamepassButton, function()
 			self:show_gamepass_menu()
 		end)
-
-		_song_select_ui.SettingsButton.MouseButton1Click:Connect(function()
+		_input:bind_input_fire(_song_select_ui.SettingsButton, function()
 			_local_services._menus:push_menu(SettingsMenu:new(_local_services))
 		end)
-		
+
+		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", _configuration.CreatorName)
+		_song_select_ui.NoSongSelectedDisplay.Visible = true
+
 		MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, asset_id, is_purchased)
 			if asset_id == _configuration.SupporterGamepassID and is_purchased == true then
 				_is_supporter = true
