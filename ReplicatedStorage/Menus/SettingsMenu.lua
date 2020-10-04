@@ -10,6 +10,8 @@ local UserInputService = game:GetService("UserInputService")
 
 local SongSelectMenu = require(game.ReplicatedStorage.Menus.SongSelectMenu)
 
+local PubSub = require(game.ReplicatedStorage.PubSub)
+
 function SettingsMenu:new(_local_services)
 	local self = MenuBase:new()
 	
