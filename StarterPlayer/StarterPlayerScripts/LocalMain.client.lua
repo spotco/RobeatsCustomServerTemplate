@@ -18,7 +18,6 @@ local function game_init()
 		_object_pool = ObjectPool:new();
 		_menus = MenuSystem:new();
 	}
-	
 	local_services._menus:push_menu(SettingsMenu:new(local_services))
 
 	local update_connection
