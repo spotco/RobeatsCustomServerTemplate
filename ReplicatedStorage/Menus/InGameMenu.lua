@@ -1,8 +1,10 @@
-local MenuBase = require(game.ReplicatedStorage.Menus.System.MenuBase)
-local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
-local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
-local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
-local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
+local MenuBase = require(a.ReplicatedStorage.Menus.System.MenuBase)
+local EnvironmentSetup = require(a.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
+local SPUtil = require(a.ReplicatedStorage.Shared.SPUtil)
+local RobeatsGame = require(a.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
+local AudioManager = require(a.ReplicatedStorage.RobeatsGameCore.AudioManager)
+
+local PubSub = require(a.ReplicatedStorage.PubSub)
 
 local InGameMenu = {}
 
@@ -54,6 +56,21 @@ function InGameMenu:new(_game)
 	
 	--[[Override--]] function self:do_remove()
 		_stat_display_ui:Destroy()
+		
+		local perf_count, great_count, okay_count, miss_count, max_combo = _game._score_manager:get_end_records()
+		local accuracy = _game._score_manager:get_accuracy()
+
+
+		PubSub.publish("SubmitScore", {
+			mapid = 0;
+			accuracy = accuracy;
+			maxcombo = max_combo;
+			perfects = perf_count;
+			greats = great_count;
+			okays = okay_count;
+			misses = miss_count;
+		})
+
 		_game:teardown()
 	end
 	
