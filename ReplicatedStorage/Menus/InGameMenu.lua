@@ -1,10 +1,10 @@
-local MenuBase = require(a.ReplicatedStorage.Menus.System.MenuBase)
-local EnvironmentSetup = require(a.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
-local SPUtil = require(a.ReplicatedStorage.Shared.SPUtil)
-local RobeatsGame = require(a.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
-local AudioManager = require(a.ReplicatedStorage.RobeatsGameCore.AudioManager)
+local MenuBase = require(game.ReplicatedStorage.Menus.System.MenuBase)
+local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
+local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
+local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
+local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
 
-local PubSub = require(a.ReplicatedStorage.PubSub)
+local PubSub = require(game.ReplicatedStorage.PubSub)
 
 local InGameMenu = {}
 
