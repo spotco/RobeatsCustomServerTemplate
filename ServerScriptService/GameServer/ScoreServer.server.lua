@@ -34,8 +34,6 @@ PubSub.subscribe("SubmitScore", function(player, sentData)
                 submitScore = true
             end
 
-            print(submitScore)
-
             if submitScore then
                 for i, v in pairs(leaderboard) do
                     if v.userid == playerID then
@@ -44,8 +42,6 @@ PubSub.subscribe("SubmitScore", function(player, sentData)
                 end
                 leaderboard[#leaderboard+1] = data
             end
-            
-            print(HttpService:JSONEncode(leaderboard))
 
             return leaderboard
         end)
