@@ -5,12 +5,13 @@ local HttpService = game:GetService("HttpService")
 
 local scoreTemplate = require(game.ReplicatedStorage.Templates.Gameplay.ScoreTemplate)
 
-local PubSub = require(game.ReplicatedStorage.PubSub)
+local Networking = require(game.ReplicatedStorage.Networking)
 
-PubSub.subscribe("SubmitScore", function(player, sentData)
+function submitScore(player, sentData)
     local playerID = player.UserId
 
     sentData.userid = playerID
+    sentData.playername = player.Name
 
     local data = scoreTemplate:new(sentData)
 
@@ -20,6 +21,8 @@ PubSub.subscribe("SubmitScore", function(player, sentData)
     -- GET THE OLD LEADERBOARD
     local suc, err = pcall(function()
         ScoreDatabase:UpdateAsync(name, function(leaderboard)
+            leaderboard = leaderboard or {}
+
             local oldScore = nil
 
             for i, v in pairs(leaderboard) do
@@ -50,4 +53,5 @@ PubSub.subscribe("SubmitScore", function(player, sentData)
     if not suc then
         warn(err)
     end
-end, "ScoreSubmissionServerSubscription")
+end, "ScoreSubmissionServerSubscription")end
+
