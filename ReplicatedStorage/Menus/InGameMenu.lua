@@ -4,11 +4,11 @@ local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
 local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
 
-local PubSub = require(game.ReplicatedStorage.PubSub)
+local Networking = require(game.ReplicatedStorage.Networking)
 
 local InGameMenu = {}
 
-function InGameMenu:new(_game)
+function InGameMenu:new(_game, _song_key)
 	local self = MenuBase:new()
 	
 	local _stat_display_ui
@@ -61,15 +61,19 @@ function InGameMenu:new(_game)
 		local accuracy = _game._score_manager:get_accuracy()
 
 
-		PubSub.publish("SubmitScore", {
-			mapid = 0;
+		local data = {
+			mapid = _song_key;
 			accuracy = accuracy;
 			maxcombo = max_combo;
 			perfects = perf_count;
 			greats = great_count;
 			okays = okay_count;
 			misses = miss_count;
-		})
+		}
+
+		spawn(function()
+			Networking.Client:Execute("SubmitScore", data)
+		end)
 
 		_game:teardown()
 	end
