@@ -53,7 +53,21 @@ function submitScore(player, sentData)
     if not suc then
         warn(err)
     end
-end, "ScoreSubmissionServerSubscription")end
+end
+
+function getLeaderboard(player, request)
+    local name = "map_"..request.mapid
+
+    local lb = {}
+    local suc, err = pcall(function()
+        lb = ScoreDatabase:GetAsync(name)
+    end)
+
+    if not suc then
+        warn(err)
+    end
+
+    return lb
 end
 
 Networking.Server:Register("SubmitScore", submitScore)
