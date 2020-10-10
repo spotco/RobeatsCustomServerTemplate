@@ -8,6 +8,8 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local SongStartMenu = require(game.ReplicatedStorage.Menus.SongStartMenu)
 local ConfirmationPopupMenu = require(game.ReplicatedStorage.Menus.ConfirmationPopupMenu)
 
+local Networking = require(game.ReplicatedStorage.Networking)
+
 --local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
 
 local SongSelectMenu = {}
@@ -24,6 +26,8 @@ function SongSelectMenu:new(_local_services)
 	local _is_supporter = false
 
 	local _input = _local_services._input
+
+	local leaderboard_proto
 	
 	function self:cons()
 		_song_select_ui = EnvironmentSetup:get_menu_protos_folder().SongSelectUI:Clone()
@@ -37,7 +41,10 @@ function SongSelectMenu:new(_local_services)
 		
 		local song_list_element_proto = song_list.SongListElementProto
 		song_list_element_proto.Parent = nil
-		
+
+		leaderboard_proto = _song_select_ui.Leaderboard.LeaderboardListElementProto
+		leaderboard_proto.Parent = nil
+
 		for itr_songkey, itr_songdata in SongDatabase:key_itr() do
 			local itr_list_element = song_list_element_proto:Clone()
 			itr_list_element.Parent = song_list
@@ -108,6 +115,43 @@ function SongSelectMenu:new(_local_services)
 			)
 		end
 	end
+
+	function self:get_formatted_data(data)
+		local str = "%.2f%% | %0d / %0d / %0d / %0d"
+		return string.format(str, data.accuracy, data.perfects, data.greats, data.okays, data.misses)
+	end
+
+	function self:refresh_leaderboard(songkey)
+		spawn(function()
+			local leaderboard = _song_select_ui.Leaderboard
+		
+			--// CLEAR LEADERBOARD
+
+			for i, v in pairs(leaderboard:GetChildren()) do
+				if v:IsA("Frame") then
+					v:Destroy()
+				end
+			end
+
+			--// GET NEW LEADERBOARD
+
+			local leaderboardData = Networking.Client:Execute("GetLeaderboard", {
+				mapid = songkey
+			}) or {}
+
+			--// RENDER NEW LEADERBOARD
+			
+			for itr, itr_data in pairs(leaderboardData) do
+				local itr_leaderboard_proto = leaderboard_proto:Clone()
+
+				itr_leaderboard_proto.Player.Text = string.format("#%d: %s", itr, itr_data.playername)
+				itr_leaderboard_proto.Data.Text = self:get_formatted_data(itr_data)
+				itr_leaderboard_proto.UserThumbnail.Image = string.format("https://www.roblox.com/headshot-thumbnail/image?userId=%d&width=420&height=420&format=png", game.Players.LocalPlayer.UserId)
+
+				itr_leaderboard_proto.Parent = leaderboard
+			end
+		end)
+	end
 	
 	function self:select_songkey(songkey)
 		if SongDatabase:contains_key(songkey) ~= true then return end
@@ -133,6 +177,7 @@ function SongSelectMenu:new(_local_services)
 			_song_select_ui.PlayButton.Text = "Play!"
 		end
 		
+		self:refresh_leaderboard(songkey)
 	end
 	
 	function self:play_button_pressed()
