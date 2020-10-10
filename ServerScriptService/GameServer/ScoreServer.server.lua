@@ -54,4 +54,7 @@ function submitScore(player, sentData)
         warn(err)
     end
 end, "ScoreSubmissionServerSubscription")end
+end
 
+Networking.Server:Register("SubmitScore", submitScore)
+Networking.Server:Register("GetLeaderboard", getLeaderboard)
