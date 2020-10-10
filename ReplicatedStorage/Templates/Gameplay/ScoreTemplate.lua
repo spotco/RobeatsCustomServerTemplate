@@ -7,6 +7,7 @@ local ScoreTemplate = Template:new({
     greats = 0;
     okays = 0;
     misses = 0;
+    playername = "";
 })
 
 return ScoreTemplate
