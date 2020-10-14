@@ -5,6 +5,7 @@ local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.Environm
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
 local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
+local Networking = require(game.ReplicatedStorage.Networking)
 
 local UserInputService = game:GetService("UserInputService")
 
@@ -85,6 +86,12 @@ function SettingsMenu:new(_local_services)
 		updateNSMULT()
 		updateADOFFSET()
 	end
+
+	function self:save_settings()
+		spawn(function()
+			Networking.Client:Execute("SaveSettings", _configuration.preferences)
+		end)
+	end
 	
 	--[[Override--]] function self:update(dt_scale)
 		
@@ -95,6 +102,7 @@ function SettingsMenu:new(_local_services)
 	end
 	
 	--[[Override--]] function self:do_remove()
+		self:save_settings()
 		_local_services._menus:push_menu(SongSelectMenu:new(_local_services))
 	end
 
