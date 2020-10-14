@@ -1,5 +1,11 @@
 local dsserializer = {}
 
+local HttpService = game:GetService("HttpService")
+
+local function j(t)
+    return HttpService:JSONEncode(t)
+end
+
 function dsserializer:generate_type(type, value)
     return {type = type, value = value}
 end
@@ -30,15 +36,16 @@ function dsserializer:deserialize_table(tab)
 
     for i, v in pairs(tab) do
         if type(v) == "table" then
-            deserialized[i] = self:deserialize_table(v)
-        else
-            local handler = v ~= nil and v.type and script.Handlers:FindFirstChild(v.type) or nil
+            --print(j(v))
+            local handler = script.Handlers:FindFirstChild(v._classname or "nil")
             if handler then
                 handler = require(handler)
-                deserialized[i] = handler:deserialize(v)
+                deserialized[i] = handler:deserialize(v.value)
             else
-                deserialized[i] = v
+                deserialized[i] = self:deserialize_table(v)
             end
+        else
+            deserialized[i] = v
         end
     end
 
