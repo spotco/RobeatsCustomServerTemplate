@@ -29,6 +29,8 @@ function SongSelectMenu:new(_local_services)
 
 	local leaderboard_proto
 	
+	local _leaderboard_is_refreshing = false
+	
 	function self:cons()
 		_song_select_ui = EnvironmentSetup:get_menu_protos_folder().SongSelectUI:Clone()
 		
@@ -118,11 +120,13 @@ function SongSelectMenu:new(_local_services)
 
 	function self:get_formatted_data(data)
 		local str = "%.2f%% | %0d / %0d / %0d / %0d"
-		return string.format(str, data.accuracy, data.perfects, data.greats, data.okays, data.misses)
+		return string.format(str, data.accuracy*100, data.perfects, data.greats, data.okays, data.misses)
 	end
 
 	function self:refresh_leaderboard(songkey)
+		if _leaderboard_is_refreshing then return end
 		spawn(function()
+			_leaderboard_is_refreshing = true
 			local leaderboard = _song_select_ui.Leaderboard
 		
 			--// CLEAR LEADERBOARD
@@ -139,6 +143,10 @@ function SongSelectMenu:new(_local_services)
 				mapid = songkey
 			}) or {}
 
+			table.sort(leaderboardData, function(a, b)
+				return a.accuracy > b.accuracy
+			end)
+
 			--// RENDER NEW LEADERBOARD
 			
 			for itr, itr_data in pairs(leaderboardData) do
@@ -146,10 +154,11 @@ function SongSelectMenu:new(_local_services)
 
 				itr_leaderboard_proto.Player.Text = string.format("#%d: %s", itr, itr_data.playername)
 				itr_leaderboard_proto.Data.Text = self:get_formatted_data(itr_data)
-				itr_leaderboard_proto.UserThumbnail.Image = string.format("https://www.roblox.com/headshot-thumbnail/image?userId=%d&width=420&height=420&format=png", game.Players.LocalPlayer.UserId)
+				itr_leaderboard_proto.UserThumbnail.Image = string.format("https://www.roblox.com/headshot-thumbnail/image?userId=%d&width=420&height=420&format=png", itr_data.userid)
 
 				itr_leaderboard_proto.Parent = leaderboard
 			end
+			_leaderboard_is_refreshing = false
 		end)
 	end
 	
