@@ -23,7 +23,6 @@ local function saveSettings(player, settings)
 
     local suc, err = pcall(function()
         local d = DatastoreSerializer:serialize_table(toSave)
-        print(HttpService:JSONEncode(d))
         SettingsDatabase:UpdateAsync(saveName, function(oldValue)
             return d
         end)
