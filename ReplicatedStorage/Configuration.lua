@@ -1,5 +1,7 @@
 local SettingsTemplate = require(game.ReplicatedStorage.Templates.General.SettingsTemplate)
 
+local DatastoreSerializer = require(game.ReplicatedStorage.Serialization.Datastore)
+
 local Networking = require(game.ReplicatedStorage.Networking)
 
 local config = SettingsTemplate:new()
@@ -13,9 +15,17 @@ function Configuration:modify(key, value)
 end
 
 function Configuration:load_from_save()
-    local settings = Networking.Client:Execute("RetrieveSettings")
+    local suc, err = pcall(function()
+        local settings = Networking.Client:Execute("RetrieveSettings")
 
+        local deserialized = DatastoreSerializer:deserialize_table(settings)
+
+        self.preferences = deserialized
+    end)
     
+    if not suc then
+        warn(err)
+    end
 end
 
 return Configuration
