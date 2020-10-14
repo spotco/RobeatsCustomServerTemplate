@@ -12,6 +12,8 @@ function InGameMenu:new(_game, _song_key)
 	local self = MenuBase:new()
 	
 	local _stat_display_ui
+
+	local _force_quit = false
 	
 	function self:cons()
 		_stat_display_ui = EnvironmentSetup:get_menu_protos_folder().InGameMenuStatDisplayUI:Clone()
@@ -19,6 +21,7 @@ function InGameMenu:new(_game, _song_key)
 		
 		_stat_display_ui.ExitButton.Activated:Connect(function()
 			if _game._audio_manager:get_mode() == AudioManager.Mode.Playing then
+				_force_quit = true
 				_game:set_mode(RobeatsGame.Mode.GameEnded)
 			end
 		end)
@@ -72,7 +75,11 @@ function InGameMenu:new(_game, _song_key)
 		}
 
 		spawn(function()
-			Networking.Client:Execute("SubmitScore", data)
+			if not _force_quit then
+				Networking.Client:Execute("SubmitScore", data)
+			else
+				print("Score not submitted because you force quitted!")
+			end
 		end)
 
 		_game:teardown()
