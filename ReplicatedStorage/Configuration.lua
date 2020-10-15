@@ -21,7 +21,9 @@ function Configuration:load_from_save()
         local deserialized = DatastoreSerializer:deserialize_table(settings or {})
 
         if settings ~= nil then
-            self.preferences = deserialized
+            for i, v in pairs(deserialized) do
+                self.preferences[i] = v
+            end
         end
     end)
     
