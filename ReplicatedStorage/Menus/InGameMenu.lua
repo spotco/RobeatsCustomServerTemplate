@@ -8,7 +8,10 @@ local Networking = require(game.ReplicatedStorage.Networking)
 
 local InGameMenu = {}
 
-function InGameMenu:new(_game, _song_key)
+function InGameMenu:new(_local_services, _game, _song_key)
+
+	local ResultsMenu = require(game.ReplicatedStorage.Menus.ResultsMenu)
+
 	local self = MenuBase:new()
 	
 	local _stat_display_ui
@@ -83,6 +86,8 @@ function InGameMenu:new(_game, _song_key)
 		end)
 
 		_game:teardown()
+
+		_local_services._menus:push_menu(ResultsMenu:new(_local_services, data))
 	end
 	
 	self:cons()
