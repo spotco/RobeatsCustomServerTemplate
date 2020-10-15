@@ -16,20 +16,10 @@ local ResultsMenu = {}
 
 function ResultsMenu:new(_local_services, _score_data)
 	local self = MenuBase:new()
-	
-	local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
-
 	local _configuration  = require(game.ReplicatedStorage.Configuration).preferences
-
 	local _results_menu_ui
-	local _selected_songkey = SongDatabase:invalid_songkey()
-	local _is_supporter = false
+	local _input = _local_services._input
 
-	local _input = _local_services._input  
-
-	local leaderboard_proto
-	
-	local _leaderboard_is_refreshing = false
 
 	-- PLEASE SIMPLIFY!
 
