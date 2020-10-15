@@ -10,8 +10,6 @@ local ConfirmationPopupMenu = require(game.ReplicatedStorage.Menus.ConfirmationP
 
 local Networking = require(game.ReplicatedStorage.Networking)
 
---local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
-
 local SongSelectMenu = {}
 
 function SongSelectMenu:new(_local_services)
