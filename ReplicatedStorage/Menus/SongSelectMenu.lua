@@ -144,6 +144,9 @@ function SongSelectMenu:new(_local_services)
 			}) or {}
 
 			table.sort(leaderboardData, function(a, b)
+				if a == nil or b == nil then
+					return false
+				end
 				return a.accuracy > b.accuracy
 			end)
 
