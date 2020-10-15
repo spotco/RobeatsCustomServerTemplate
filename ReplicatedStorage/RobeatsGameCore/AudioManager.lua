@@ -23,9 +23,12 @@ AudioManager.Mode = {
 }
 
 function AudioManager:new(_game)
+
 	local self = {}
 
 	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
+
+	local _rate = 1
 	
 	--Note speed in milliseconds, from time it takes to spawn the note to time the note is hit. Default value is 1500, or 1.5 seconds.
 	--To add a multiplier to this, set _configuration.NoteSpeedMultiplier
@@ -33,12 +36,12 @@ function AudioManager:new(_game)
 	function self:get_note_prebuffer_time_ms() return _note_prebuffer_time end
 	
 	--Note timings: millisecond offset (positive is early, negative is late) mapping to what the note result is
-	local _note_okay_max = _configuration.NoteOkayMaxMS --Default: 260
-	local _note_great_max = _configuration.NoteGreatMaxMS --Default: 140
-	local _note_perfect_max = _configuration.NotePerfectMaxMS --Default: 40
-	local _note_perfect_min = _configuration.NotePerfectMinMS --Default: -20
-	local _note_great_min = _configuration.NoteGreatMinMS --Default: -70
-	local _note_okay_min = _configuration.NoteOkayMinMS --Default: -140
+	local _note_okay_max = _configuration.NoteOkayMaxMS * _rate --Default: 260
+	local _note_great_max = _configuration.NoteGreatMaxMS * _rate --Default: 140
+	local _note_perfect_max = _configuration.NotePerfectMaxMS * _rate --Default: 40
+	local _note_perfect_min = _configuration.NotePerfectMinMS * _rate --Default: -20
+	local _note_great_min = _configuration.NoteGreatMinMS * _rate --Default: -70
+	local _note_okay_min = _configuration.NoteOkayMinMS * _rate --Default: -140
 	
 	--Called in NoteResult:timedelta_to_result(time_to_end, _game)
 	function self:get_note_result_timing()
@@ -119,7 +122,7 @@ function AudioManager:new(_game)
 		end
 		
 		--Apply note speed multiplier
-		_note_prebuffer_time = _current_audio_data.AudioNotePrebufferTime / _configuration.NoteSpeedMultiplier
+		_note_prebuffer_time = (_current_audio_data.AudioNotePrebufferTime / _configuration.NoteSpeedMultiplier)*_rate
 	end
 
 	function self:teardown()
@@ -199,6 +202,7 @@ function AudioManager:new(_game)
 	local _ended_connection = nil
 
 	function self:update(dt_scale)
+		dt_scale *= _rate
 		if _current_mode == AudioManager.Mode.PreStart then
 			--Do pre-start countdown
 			local pre_start_time_pre = _pre_start_time_ms
@@ -235,7 +239,7 @@ function AudioManager:new(_game)
 			if _pre_start_time_ms >= _pre_countdown_time_ms then
 				_bgm.TimePosition = 0
 				_bgm.Volume = _audio_volume
-				_bgm.PlaybackSpeed = 1
+				_bgm.PlaybackSpeed = _rate
 				_bgm_time_position = 0
 				_ended_connection = _bgm.Ended:Connect(function()
 					_raise_ended_trigger = true
