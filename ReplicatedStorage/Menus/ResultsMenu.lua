@@ -20,6 +20,7 @@ function ResultsMenu:new(_local_services, _score_data)
 	local _results_menu_ui
 	local _input = _local_services._input
 
+	local _back_pressed = false
 
 	-- PLEASE SIMPLIFY!
 
@@ -36,6 +37,11 @@ function ResultsMenu:new(_local_services, _score_data)
 	
 	function self:cons()
 		_results_menu_ui = EnvironmentSetup:get_menu_protos_folder().ResultsMenuUI:Clone()
+
+		_input:bind_input_fire(_results_menu_ui.BackButton, function()
+			_back_pressed = true
+		end)
+
 		self:set_data()
 	end
 
@@ -84,6 +90,10 @@ function ResultsMenu:new(_local_services, _score_data)
 		else
 			_results_menu_ui.Parent = nil
 		end
+	end
+
+	function self:should_remove()
+		return _back_pressed
 	end
 	
 	self:cons()
