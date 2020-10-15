@@ -18,9 +18,11 @@ function Configuration:load_from_save()
     local suc, err = pcall(function()
         local settings = Networking.Client:Execute("RetrieveSettings")
 
-        local deserialized = DatastoreSerializer:deserialize_table(settings)
+        local deserialized = DatastoreSerializer:deserialize_table(settings or {})
 
-        self.preferences = deserialized
+        if settings ~= nil then
+            self.preferences = deserialized
+        end
     end)
     
     if not suc then
