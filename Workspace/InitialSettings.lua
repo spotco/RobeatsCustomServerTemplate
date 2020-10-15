@@ -11,7 +11,7 @@ return {
     NoteSpeedMultiplier = 1;
     PostFinishWaitTimeMS = 300;
     PreStartCountdownTimeMS = 3000;
-    SupporterGamepassID = 11742318;
+    SupporterGamepassID = 12274447;
     Keybinds = {
         Enum.KeyCode.Q,
         Enum.KeyCode.W,
