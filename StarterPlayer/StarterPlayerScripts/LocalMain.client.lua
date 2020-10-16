@@ -7,6 +7,7 @@ local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.Environm
 local MenuSystem = require(game.ReplicatedStorage.Menus.System.MenuSystem)
 
 local SongSelectMenu = require(game.ReplicatedStorage.Menus.SongSelectMenu)
+local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
 
 local function game_init()
 	EnvironmentSetup:initial_setup()
@@ -17,9 +18,8 @@ local function game_init()
 		_object_pool = ObjectPool:new();
 		_menus = MenuSystem:new();
 	}
-	
-	local_services._menus:push_menu(SongSelectMenu:new(local_services))
-	
+	local_services._menus:push_menu(SettingsMenu:new(local_services))
+
 	local update_connection
 	update_connection = game:GetService("RunService").Heartbeat:Connect(function(tick_delta)
 		local success, err = SPUtil:try(function()

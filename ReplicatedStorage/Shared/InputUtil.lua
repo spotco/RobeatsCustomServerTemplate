@@ -61,7 +61,9 @@ function InputUtil:new()
 	local _has_recorded_keycode_input = false
 	local _recorded_keycode = 0
 
-	local _custom_key_keycode = SPDict:new()
+	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
+
+	local _custom_binds = _configuration.Keybinds
 
 	function self:cons()
 		
@@ -184,6 +186,20 @@ function InputUtil:new()
 		nearest_touch:set(x,y)
 	end
 
+	function self:bind_input_fire(object_, callback_)
+		local cb = function(i,n)
+			if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+				callback_(i,n)
+			end
+		end
+		local suc, err = pcall(function()
+			object_.Activated:Connect(cb)
+		end)
+		if not suc then
+			object_.InputBegan:Connect(cb)
+		end
+	end
+
 	function self:touch_ended(x,y)
 		local touch_ended_spvec = SPVector:new(x,y)
 		local nearest_touch, i_nearest_touch = get_nearest_touch(touch_ended_spvec)
@@ -277,59 +293,29 @@ function InputUtil:new()
 		end
 
 		if control == InputUtil.KEY_TRACK1 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK1) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK1))
-			end
-			return active_dict:contains(Enum.KeyCode.A) or
-				active_dict:contains(Enum.KeyCode.J) or
-				active_dict:contains(Enum.KeyCode.One) or
-				active_dict:contains(Enum.KeyCode.Q) or
-				active_dict:contains(Enum.KeyCode.U) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1)
+			return active_dict:contains(Enum.KeyCode.X) or
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1) or
+				active_dict:contains(_custom_binds[1])
 
 		elseif control == InputUtil.KEY_TRACK2 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK2) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK2))
-			end
-			return active_dict:contains(Enum.KeyCode.S) or
-				active_dict:contains(Enum.KeyCode.K) or
-				active_dict:contains(Enum.KeyCode.Two) or
-				active_dict:contains(Enum.KeyCode.W) or
-				active_dict:contains(Enum.KeyCode.I) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2)
+			return active_dict:contains(Enum.KeyCode.C) or
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2) or
+				active_dict:contains(_custom_binds[2])
 
 		elseif control == InputUtil.KEY_TRACK3 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK3) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK3))
-			end
-			return active_dict:contains(Enum.KeyCode.D) or
-				active_dict:contains(Enum.KeyCode.L) or
-				active_dict:contains(Enum.KeyCode.Three) or
-				active_dict:contains(Enum.KeyCode.E) or
-				active_dict:contains(Enum.KeyCode.O) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3)
+			return active_dict:contains(Enum.KeyCode.Comma) or
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3) or
+				active_dict:contains(_custom_binds[3])
 
 		elseif control == InputUtil.KEY_TRACK4 then
-			if (SPUtil:is_mobile() == false) and _custom_key_keycode:contains(InputUtil.KEY_TRACK4) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_TRACK4))
-			end
-			return active_dict:contains(Enum.KeyCode.F)	or
-				active_dict:contains(Enum.KeyCode.Semicolon) or
-				active_dict:contains(Enum.KeyCode.Four) or
-				active_dict:contains(Enum.KeyCode.R) or
-				active_dict:contains(Enum.KeyCode.P) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4)
+			return active_dict:contains(Enum.KeyCode.Period)	or
+				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4) or
+				active_dict:contains(_custom_binds[4])
 
 		elseif control == InputUtil.KEY_POWERBAR_TRIGGER then
-			if _custom_key_keycode:contains(InputUtil.KEY_POWERBAR_TRIGGER) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_POWERBAR_TRIGGER))
-			end
 			return active_dict:contains(Enum.KeyCode.Space)
 
 		elseif control == InputUtil.KEY_GAME_QUIT then
-			if _custom_key_keycode:contains(InputUtil.KEY_GAME_QUIT) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_GAME_QUIT))
-			end
 			return active_dict:contains(Enum.KeyCode.Backspace)
 
 		elseif control == InputUtil.KEY_DOWN then
@@ -364,15 +350,9 @@ function InputUtil:new()
 			return active_dict:contains(Enum.KeyCode.Backspace)
 
 		elseif control == InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS then
-			if _custom_key_keycode:contains(InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS)) and (_textbox_focused == false)
-			end
 			return active_dict:contains(Enum.KeyCode.Period) and (_textbox_focused == false)
 
 		elseif control == InputUtil.KEY_CHAT_WINDOW_FOCUS then
-			if _custom_key_keycode:contains(InputUtil.KEY_CHAT_WINDOW_FOCUS) then
-				return active_dict:contains(_custom_key_keycode:get(InputUtil.KEY_CHAT_WINDOW_FOCUS)) and (_textbox_focused == false)
-			end
 			return active_dict:contains(Enum.KeyCode.Slash) and (_textbox_focused == false)
 
 		elseif control == InputUtil.KEY_MENU_SPUITEXTINPUT_ESC then
@@ -411,7 +391,6 @@ function InputUtil:new()
 		else
 			error("INPUTKEY NOT FOUND ",control)
 			return false
-
 		end
 	end
 
@@ -477,13 +456,13 @@ function InputUtil:new()
 		elseif key == InputUtil.KEY_CHAT_WINDOW_FOCUS then
 			return "/"
 		elseif key == InputUtil.KEY_TRACK1 then
-			return "A/J/Q/U/1"
+			return "X"
 		elseif key == InputUtil.KEY_TRACK2 then
-			return "S/K/W/I/2"
+			return "C"
 		elseif key == InputUtil.KEY_TRACK3 then
-			return "D/L/E/O/3"
+			return ","
 		elseif key == InputUtil.KEY_TRACK4 then
-			return "F/;/R/P/4"
+			return "."
 		elseif key == InputUtil.KEY_POWERBAR_TRIGGER then
 			return "Space"
 		else

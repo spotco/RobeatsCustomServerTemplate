@@ -45,7 +45,7 @@ function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
 			_game:teardown()
 		else
 			_game:start_game()
-			_local_services._menus:push_menu(InGameMenu:new(_game))
+			_local_services._menus:push_menu(InGameMenu:new(_local_services, _game, _start_song_key))
 		end
 	end
 	
