@@ -28,7 +28,7 @@ function AudioManager:new(_game)
 
 	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
 
-	local _rate = 1
+	local _rate = 1 --Rate multiplier, you may implement some sort of way to modify the rate at runtime.
 	
 	--Note speed in milliseconds, from time it takes to spawn the note to time the note is hit. Default value is 1500, or 1.5 seconds.
 	--To add a multiplier to this, set _configuration.NoteSpeedMultiplier
@@ -49,7 +49,7 @@ function AudioManager:new(_game)
 	end
 	
 	--Time in milliseconds after note expected hit time to remove note (and do a Time miss)
-	local _note_remove_time = _configuration.NoteRemoveTimeMS --Default: -200
+	local _note_remove_time = _configuration.NoteRemoveTimeMS * _rate --Default: -200
 	function self:get_note_remove_time() return _note_remove_time end
 	
 	--Time in milliseconds countdown will take
