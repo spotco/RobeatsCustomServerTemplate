@@ -2,15 +2,6 @@ local MenuBase = require(game.ReplicatedStorage.Menus.System.MenuBase)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local SongDatabase = require(game.ReplicatedStorage.RobeatsGameCore.SongDatabase)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
-local GameSlot = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameSlot)
-local MarketplaceService = game:GetService("MarketplaceService")
-
-local SongStartMenu = require(game.ReplicatedStorage.Menus.SongStartMenu)
-local ConfirmationPopupMenu = require(game.ReplicatedStorage.Menus.ConfirmationPopupMenu)
-
-local Networking = require(game.ReplicatedStorage.Networking)
-
---local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
 
 local ResultsMenu = {}
 
@@ -46,6 +37,9 @@ function ResultsMenu:new(_local_services, _score_data)
 	end
 
 	function self:set_data()
+		local _song_key = _score_data.mapid
+		local _key_data = SongDatabase:get_data_for_key(_song_key)
+
 		local img = ""
 		for i = 1, #_accuracy_marks do
 			local accuracyGrade = _accuracy_marks[i]
@@ -56,10 +50,27 @@ function ResultsMenu:new(_local_services, _score_data)
 				img = _grade_images[#_grade_images]
 			end
 		end
-		print(img)
-		_results_menu_ui.Grade.Image = img
+
+		_results_menu_ui.Grade.Image = img or ""
 		_results_menu_ui.Accuracy.Text = string.format("%0.2f%%", _score_data.accuracy*100)
-		_results_menu_ui.Spread.Text = string.format("%0d | %0d | %0d | %0d", _score_data.perfects, _score_data.greats, _score_data.okays, _score_data.misses)
+		--_score_data.perfects, _score_data.greats, _score_data.okays, _score_data.misses
+
+		--HANDLE SPREAD RENDERING
+
+		local _spread_display = _results_menu_ui.SpreadDisplay
+
+		local total_judges = #_key_data.HitObjects
+		_spread_display.Perfects.Size = UDim2.new(_score_data.perfects/total_judges,0,0.25,0)
+		_spread_display.PerfectCount.Text = _score_data.perfects
+
+		_spread_display.Greats.Size = UDim2.new(_score_data.greats/total_judges,0,0.25,0)
+		_spread_display.GreatCount.Text = _score_data.greats
+
+		_spread_display.Okays.Size = UDim2.new(_score_data.okays/total_judges,0,0.25,0)
+		_spread_display.OkayCount.Text = _score_data.okays
+
+		_spread_display.Misses.Size = UDim2.new(_score_data.misses/total_judges,0,0.25,0)
+		_spread_display.MissCount.Text = _score_data.misses
 
 		local time = DateTime.now()
 
@@ -67,7 +78,21 @@ function ResultsMenu:new(_local_services, _score_data)
 		local _hour = (timeLocal.Hour % 12) == 0 and 12 or timeLocal.Hour % 12
 		local ampm = timeLocal.Hour >= 12 and "PM" or "AM"
 
-		_results_menu_ui.PlayerInfo.Text = string.format("Played by %s at %0d:%2d%s on %2d/%0d/%4d", game.Players.LocalPlayer.Name, _hour, timeLocal.Minute, ampm, timeLocal.Month, timeLocal.Day, timeLocal.Year);
+		_results_menu_ui.PlayerInfo.Text = string.format("Played by %s at %0d:%2d%s on %2d/%0d/%4d",
+			game.Players.LocalPlayer.Name,
+			_hour,
+			timeLocal.Minute,
+			ampm,
+			timeLocal.Month,
+			timeLocal.Day,
+			timeLocal.Year
+		);
+
+		_results_menu_ui.MapInfo.Text = string.format("%s - %s [%0d]",
+			SongDatabase:get_title_for_key(_song_key),
+			SongDatabase:get_artist_for_key(_song_key),
+			SongDatabase:get_difficulty_for_key(_song_key)
+		)
 	end
 
 	function self:get_formatted_data(data)
