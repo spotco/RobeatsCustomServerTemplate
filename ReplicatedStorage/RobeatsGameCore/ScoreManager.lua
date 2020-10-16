@@ -99,7 +99,6 @@ function ScoreManager:new(_game)
 		end
 		
 		_max_chain = math.max(_chain,_max_chain)
-		
 	end
 
 	function self:update(dt_scale)
