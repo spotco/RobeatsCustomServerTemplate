@@ -67,7 +67,7 @@ end
 function mersenne_twister:random(a, b)
 	local y
 	if self.index == 0 then
-		for i = 0, 623 do   											
+		for i = 0, 623 do	 											
 			--y = bit_or(math_floor(self.mt[i] / 0x80000000) * 0x80000000, self.mt[(i + 1) % 624] % 0x80000000)
 			y = self.mt[(i + 1) % 624] % 0x80000000
 			self.mt[i] = bit_xor(self.mt[(i + 397) % 624], math_floor(y / 2))
@@ -132,7 +132,7 @@ end
 function lcg(s, r)
 	local temp = {}
 	setmetatable(temp, linear_congruential_generator)
-	temp.a, temp.c, temp.m = 1103515245, 12345, 0x10000  --from Ansi C
+	temp.a, temp.c, temp.m = 1103515245, 12345, 0x10000	--from Ansi C
 	if r then
 		if r == 'nr' then temp.a, temp.c, temp.m = 1664525, 1013904223, 0x10000 --from Numerical Recipes.
 		elseif r == 'mvc' then temp.a, temp.c, temp.m = 214013, 2531011, 0x10000 end--from MVC
@@ -178,7 +178,7 @@ end
 function mwc(s, r)
 	local temp = {}
 	setmetatable(temp, multiply_with_carry)
-	temp.a, temp.c, temp.m = 1103515245, 12345, 0x10000  --from Ansi C
+	temp.a, temp.c, temp.m = 1103515245, 12345, 0x10000	--from Ansi C
 	if r then
 		if r == 'nr' then temp.a, temp.c, temp.m = 1664525, 1013904223, 0x10000 --from Numerical Recipes.
 		elseif r == 'mvc' then temp.a, temp.c, temp.m = 214013, 2531011, 0x10000 end--from MVC

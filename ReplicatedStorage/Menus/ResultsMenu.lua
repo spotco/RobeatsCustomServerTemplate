@@ -7,7 +7,7 @@ local ResultsMenu = {}
 
 function ResultsMenu:new(_local_services, _score_data)
 	local self = MenuBase:new()
-	local _configuration  = require(game.ReplicatedStorage.Configuration).preferences
+	local _configuration	= require(game.ReplicatedStorage.Configuration).preferences
 	local _results_menu_ui
 	local _input = _local_services._input
 

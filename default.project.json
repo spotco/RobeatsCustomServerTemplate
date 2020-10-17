@@ -1,62 +1,62 @@
 {
-  "name": "RobeatsCustomServerTemplate",
-  "tree": {
-    "$className": "DataModel",
+	"name": "RobeatsCustomServerTemplate",
+	"tree": {
+		"$className": "DataModel",
 
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "$path": "ReplicatedStorage"
-    },
-    "StarterPlayer": {
-      "$className": "StarterPlayer",
-      "$path": "StarterPlayer",
-      "StarterPlayerScripts": {
-        "$className": "StarterPlayerScripts",
-        "$path": "StarterPlayer/StarterPlayerScripts"
-      },
-      "StarterCharacterScripts": {
-        "$className": "StarterCharacterScripts",
-        "$path": "StarterPlayer/StarterCharacterScripts"
-      }
-    },
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"$path": "ReplicatedStorage"
+		},
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"$path": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"$path": "StarterPlayer/StarterPlayerScripts"
+			},
+			"StarterCharacterScripts": {
+				"$className": "StarterCharacterScripts",
+				"$path": "StarterPlayer/StarterCharacterScripts"
+			}
+		},
 
-    "ServerScriptService": {
-      "$className": "ServerScriptService",
-      "$path": "ServerScriptService"
-    },
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"$path": "ServerScriptService"
+		},
 
-    "Workspace": {
-      "$className": "Workspace",
-      "$path": "Workspace",
-      "$properties": {
-        "FilteringEnabled": true
-      }
-    },
-    "Lighting": {
-      "$className": "Lighting",
-      "$properties": {
-        "Ambient": [
-          0,
-          0,
-          0
-        ],
-        "Brightness": 2,
-        "GlobalShadows": true,
-        "Outlines": false,
-        "Technology": "Voxel"
-      }
-    },
-    "SoundService": {
-      "$className": "SoundService",
-      "$properties": {
-        "RespectFilteringEnabled": true
-      }
-    },
-    "HttpService": {
-      "$className": "HttpService",
-      "$properties": {
-        "HttpEnabled": true
-      }
-    }
-  }
+		"Workspace": {
+			"$className": "Workspace",
+			"$path": "Workspace",
+			"$properties": {
+				"FilteringEnabled": true
+			}
+		},
+		"Lighting": {
+			"$className": "Lighting",
+			"$properties": {
+				"Ambient": [
+					0,
+					0,
+					0
+				],
+				"Brightness": 2,
+				"GlobalShadows": true,
+				"Outlines": false,
+				"Technology": "Voxel"
+			}
+		},
+		"SoundService": {
+			"$className": "SoundService",
+			"$properties": {
+				"RespectFilteringEnabled": true
+			}
+		},
+		"HttpService": {
+			"$className": "HttpService",
+			"$properties": {
+				"HttpEnabled": true
+			}
+		}
+	}
 }

@@ -12,7 +12,7 @@ rtv.AudioMod = 1
 rtv.AudioHitSFXGroup = 0
 rtv.HitObjects = {}
 local function note(time,track) rtv.HitObjects[#rtv.HitObjects+1]={Time=time;Type=1;Track=track;} end
-local function hold(time,track,duration) rtv.HitObjects[#rtv.HitObjects+1] = {Time=time;Type=2;Track=track;Duration=duration;}  end
+local function hold(time,track,duration) rtv.HitObjects[#rtv.HitObjects+1] = {Time=time;Type=2;Track=track;Duration=duration;}	end
 --
 note(0,1)--0
 note(420,1)--1

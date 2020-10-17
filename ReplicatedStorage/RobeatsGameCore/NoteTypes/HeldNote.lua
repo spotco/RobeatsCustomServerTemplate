@@ -450,7 +450,7 @@ function HeldNote:new(
 				_game._score_manager:register_hit(
 					note_result, 
 					_slot_index, 
-					_track_index,  
+					_track_index,	
 					HitParams:new():set_play_hold_effect(false)
 				)
 				_state = HeldNote.State.HoldMissedActive

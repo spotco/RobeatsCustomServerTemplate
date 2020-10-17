@@ -17,7 +17,7 @@ function SongSelectMenu:new(_local_services)
 	
 	local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
 
-	local _configuration  = require(game.ReplicatedStorage.Configuration).preferences
+	local _configuration	= require(game.ReplicatedStorage.Configuration).preferences
 
 	local _song_select_ui
 	local _selected_songkey = SongDatabase:invalid_songkey()

@@ -59,7 +59,7 @@ function NoteTrackSystem:new(_game, _game_slot)
 			itr_track:update(dt_scale)
 		end
 
-		for i=_notes:count(),1,-1  do
+		for i=_notes:count(),1,-1	do
 			local itr_note = _notes:get(i)
 
 			itr_note:update(dt_scale)

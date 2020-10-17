@@ -1,6 +1,6 @@
 local SPDict = require(game.ReplicatedStorage.Shared.SPDict)
 
-local SongErrorParser  = {}
+local SongErrorParser	= {}
 
 local __tmpctr = 4
 local function track_time_to_hash(p_track,p_time)

@@ -17,9 +17,9 @@ function SPVector:new(x,y,z)
 	}
 
 	function self:add_scaled(vec, scale)
-		self._x = self._x +  vec._x * scale
-		self._y = self._y +  vec._y * scale
-		self._z = self._z +  vec._z * scale
+		self._x = self._x +	vec._x * scale
+		self._y = self._y +	vec._y * scale
+		self._z = self._z +	vec._z * scale
 	end
 	function self:set(x,y,z)
 		if x ~= nil then
