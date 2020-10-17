@@ -2,6 +2,7 @@ local MenuBase = require(game.ReplicatedStorage.Menus.System.MenuBase)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local SongDatabase = require(game.ReplicatedStorage.RobeatsGameCore.SongDatabase)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
+local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 
 local ResultsMenu = {}
 
@@ -29,7 +30,7 @@ function ResultsMenu:new(_local_services, _score_data)
 	function self:cons()
 		_results_menu_ui = EnvironmentSetup:get_menu_protos_folder().ResultsMenuUI:Clone()
 
-		_input:bind_input_fire(_results_menu_ui.BackButton, function()
+		SPUtil:bind_input_fire(_results_menu_ui.BackButton, function()
 			_back_pressed = true
 		end)
 
@@ -72,20 +73,9 @@ function ResultsMenu:new(_local_services, _score_data)
 		_spread_display.Misses.Size = UDim2.new(_score_data.misses/total_judges,0,0.25,0)
 		_spread_display.MissCount.Text = _score_data.misses
 
-		local time = DateTime.now()
-
-		local timeLocal = time:ToLocalTime()
-		local _hour = (timeLocal.Hour % 12) == 0 and 12 or timeLocal.Hour % 12
-		local ampm = timeLocal.Hour >= 12 and "PM" or "AM"
-
-		_results_menu_ui.PlayerInfo.Text = string.format("Played by %s at %0d:%2d%s on %2d/%0d/%4d",
+		_results_menu_ui.PlayerInfo.Text = string.format("Played by %s at %s",
 			game.Players.LocalPlayer.Name,
-			_hour,
-			timeLocal.Minute,
-			ampm,
-			timeLocal.Month,
-			timeLocal.Day,
-			timeLocal.Year
+			SPUtil:time_to_str(os.time())
 		);
 
 		_results_menu_ui.MapInfo.Text = string.format("%s - %s [%0d]",

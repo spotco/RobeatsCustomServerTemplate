@@ -1,13 +1,9 @@
-local SettingsTemplate = require(game.ReplicatedStorage.Templates.General.SettingsTemplate)
-
 local DatastoreSerializer = require(game.ReplicatedStorage.Serialization.Datastore)
-
 local Networking = require(game.ReplicatedStorage.Networking)
-
-local config = SettingsTemplate:new()
+local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 
 local Configuration = {
-		preferences = config
+		preferences = SPUtil:copy_table(require(workspace.InitialSettings))
 }
 
 function Configuration:modify(key, value)

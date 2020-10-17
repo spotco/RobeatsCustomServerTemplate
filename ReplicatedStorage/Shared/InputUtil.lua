@@ -10,11 +10,6 @@ InputUtil.KEY_TRACK2 = 1
 InputUtil.KEY_TRACK3 = 2
 InputUtil.KEY_TRACK4 = 3
 
-InputUtil.KEY_POWERBAR_TRIGGER = 4
-
-InputUtil.KEY_GAME_QUIT = 5
-
-InputUtil.KEY_UP = 10
 InputUtil.KEY_DOWN = 11
 InputUtil.KEY_LEFT = 12
 InputUtil.KEY_RIGHT = 13
@@ -57,17 +52,11 @@ function InputUtil:new()
 	local _textbox_focused = false
 	local _do_textbox_unfocus = false
 
-	local _recording_keycode_input = false
-	local _has_recorded_keycode_input = false
-	local _recorded_keycode = 0
-
 	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
 
 	local _custom_binds = _configuration.Keybinds
 
 	function self:cons()
-		
-
 		userinput_service.TextBoxFocused:connect(function(textbox)
 			_textbox_focused = true
 		end)
@@ -186,20 +175,6 @@ function InputUtil:new()
 		nearest_touch:set(x,y)
 	end
 
-	function self:bind_input_fire(object_, callback_)
-		local cb = function(i,n)
-			if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
-				callback_(i,n)
-			end
-		end
-		local suc, err = pcall(function()
-			object_.Activated:Connect(cb)
-		end)
-		if not suc then
-			object_.InputBegan:Connect(cb)
-		end
-	end
-
 	function self:touch_ended(x,y)
 		local touch_ended_spvec = SPVector:new(x,y)
 		local nearest_touch, i_nearest_touch = get_nearest_touch(touch_ended_spvec)
@@ -293,88 +268,20 @@ function InputUtil:new()
 		end
 
 		if control == InputUtil.KEY_TRACK1 then
-			return active_dict:contains(Enum.KeyCode.X) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1) or
-				active_dict:contains(_custom_binds[1])
+			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1) or
+				active_dict:contains_any(_custom_binds[1])
 
 		elseif control == InputUtil.KEY_TRACK2 then
-			return active_dict:contains(Enum.KeyCode.C) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2) or
-				active_dict:contains(_custom_binds[2])
+			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2) or
+				active_dict:contains_any(_custom_binds[2])
 
 		elseif control == InputUtil.KEY_TRACK3 then
-			return active_dict:contains(Enum.KeyCode.Comma) or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3) or
-				active_dict:contains(_custom_binds[3])
+			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3) or
+				active_dict:contains_any(_custom_binds[3])
 
 		elseif control == InputUtil.KEY_TRACK4 then
-			return active_dict:contains(Enum.KeyCode.Period)	or
-				active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4) or
-				active_dict:contains(_custom_binds[4])
-
-		elseif control == InputUtil.KEY_POWERBAR_TRIGGER then
-			return active_dict:contains(Enum.KeyCode.Space)
-
-		elseif control == InputUtil.KEY_GAME_QUIT then
-			return active_dict:contains(Enum.KeyCode.Backspace)
-
-		elseif control == InputUtil.KEY_DOWN then
-			return active_dict:contains(Enum.KeyCode.Down)
-
-		elseif control == InputUtil.KEY_UP then
-			return active_dict:contains(Enum.KeyCode.Up)
-
-		elseif control == InputUtil.KEY_LEFT then
-			return active_dict:contains(Enum.KeyCode.Left)
-
-		elseif control == InputUtil.KEY_RIGHT then
-			return active_dict:contains(Enum.KeyCode.Right)
-			
-		elseif control == InputUtil.KEY_A then
-			return active_dict:contains(Enum.KeyCode.A)
-			
-		elseif control == InputUtil.KEY_B then
-			return active_dict:contains(Enum.KeyCode.B)
-			
-		elseif control == InputUtil.KEY_MOD1 then
-			return active_dict:contains(Enum.KeyCode.LeftShift)
-
-		elseif control == InputUtil.KEY_MENU_OPEN then
-			return active_dict:contains(Enum.KeyCode.Return)
-
-		elseif control == InputUtil.KEY_MENU_ENTER then
-			return false
-			--return (active_dict:contains(Enum.KeyCode.Return) and _textbox_focused == false)
-
-		elseif control == InputUtil.KEY_MENU_BACK then
-			return active_dict:contains(Enum.KeyCode.Backspace)
-
-		elseif control == InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS then
-			return active_dict:contains(Enum.KeyCode.Period) and (_textbox_focused == false)
-
-		elseif control == InputUtil.KEY_CHAT_WINDOW_FOCUS then
-			return active_dict:contains(Enum.KeyCode.Slash) and (_textbox_focused == false)
-
-		elseif control == InputUtil.KEY_MENU_SPUITEXTINPUT_ESC then
-			return active_dict:contains(Enum.KeyCode.Escape)
-
-		elseif control == InputUtil.KEY_SCROLL_UP then
-			return active_dict:contains(InputUtil.KEY_SCROLL_UP)
-
-		elseif control == InputUtil.KEY_SCROLL_DOWN then
-			return active_dict:contains(InputUtil.KEY_SCROLL_DOWN)
-
-		elseif control == InputUtil.KEY_DEBUG_1 then
-			return active_dict:contains(Enum.KeyCode.PageUp)
-
-		elseif control == InputUtil.KEY_DEBUG_2 then
-			return active_dict:contains(Enum.KeyCode.PageDown)
-		
-		elseif control == InputUtil.KEY_DEBUG_3 then
-			return active_dict:contains(Enum.KeyCode.Home)
-			
-		elseif control == InputUtil.KEY_DEBUG_4 then
-			return active_dict:contains(Enum.KeyCode.End)
+			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4) or
+				active_dict:contains_any(_custom_binds[4])
 
 		elseif control == InputUtil.KEYCODE_TOUCH_TRACK1 then
 			return _down_keys:contains(InputUtil.KEYCODE_TOUCH_TRACK1)
@@ -408,66 +315,6 @@ function InputUtil:new()
 	end
 	function self:clear_just_released_keys()
 		_just_released_keys:clear()
-	end
-
-	--------- Keycode Record
-
-	function self:record_next_keycode_input()
-		_recording_keycode_input = true
-		_has_recorded_keycode_input = false
-	end
-
-	function self:has_recorded_keycode_input()
-		return _has_recorded_keycode_input
-	end
-
-	function self:cancel_record_next_keycode_input()
-		_recording_keycode_input = false
-	end
-
-	function self:get_recorded_keycode()
-		return _recorded_keycode
-	end
-
-	--------- Custom controls
-
-	function self:reset_to_default_controls()
-		_custom_key_keycode:clear()
-	end
-
-	function self:set_custom_key_keycode(key, keycode)
-		_custom_key_keycode:add(key, keycode)
-	end
-	
-	function self:remove_custom_key(key)
-		_custom_key_keycode:remove(key)
-	end
-
-	function self:get_custom_key_keycode(key)
-		return _custom_key_keycode:get(key)
-	end
-
-	function self:get_key_display_str(key)
-		if _custom_key_keycode:contains(key) then
-			return _custom_key_keycode:get(key).Name
-		end
-		if key == InputUtil.KEY_MENU_MATCHMAKING_CHAT_FOCUS then
-			return "."
-		elseif key == InputUtil.KEY_CHAT_WINDOW_FOCUS then
-			return "/"
-		elseif key == InputUtil.KEY_TRACK1 then
-			return "X"
-		elseif key == InputUtil.KEY_TRACK2 then
-			return "C"
-		elseif key == InputUtil.KEY_TRACK3 then
-			return ","
-		elseif key == InputUtil.KEY_TRACK4 then
-			return "."
-		elseif key == InputUtil.KEY_POWERBAR_TRIGGER then
-			return "Space"
-		else
-			return string.format("??? (%d)",tostring(key))
-		end
 	end
 
 	self:cons()

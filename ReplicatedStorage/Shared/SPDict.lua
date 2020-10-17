@@ -32,6 +32,14 @@ function SPDict:new()
 	function self:contains(key)
 		return self._table[key] ~= nil
 	end
+	function self:contains_any(any_table)
+		for i=1,#any_table do
+			if self:contains(any_table[i]) then
+				return true
+			end
+		end
+		return false
+	end
 	function self:count()
 		return _count
 	end

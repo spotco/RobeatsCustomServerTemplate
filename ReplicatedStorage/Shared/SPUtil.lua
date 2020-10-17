@@ -133,4 +133,32 @@ function SPUtil:screen_size()
 	return __cached_screen_size
 end
 
+function SPUtil:time_to_str(time)
+	return os.date("%H:%M %d-%m-%Y",time)
+end
+
+function SPUtil:bind_input_fire(object_, callback_)
+	local cb = function(i,n)
+		if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+			callback_(i,n)
+		end
+	end
+	local suc, err = pcall(function()
+		object_.Activated:Connect(cb)
+	end)
+	if not suc then
+		object_.InputBegan:Connect(cb)
+	end
+end
+
+function SPUtil:copy_table(datatable)
+	local tblRes={}
+	if type(datatable)=="table" then
+		for k,v in pairs(datatable) do tblRes[k]=SPUtil:copy_table(v) end
+	else
+		tblRes=datatable
+	end
+	return tblRes
+end
+
 return SPUtil

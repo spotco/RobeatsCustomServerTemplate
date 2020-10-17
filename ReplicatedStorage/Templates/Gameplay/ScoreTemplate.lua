@@ -1,5 +1,5 @@
 local Template = require(game.ReplicatedStorage.Templates.Template)
-local ScoreTemplate = Template:new({
+local ScoreTemplate = {
 		mapid = 0;
 		accuracy = 0;
 		maxcombo = 0;
@@ -8,6 +8,7 @@ local ScoreTemplate = Template:new({
 		okays = 0;
 		misses = 0;
 		playername = "";
-})
+		time = 0;
+}
 
 return ScoreTemplate

@@ -1,5 +1,3 @@
-local SettingsMenu = {}
-
 local MenuBase = require(game.ReplicatedStorage.Menus.System.MenuBase)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
@@ -11,10 +9,12 @@ local UserInputService = game:GetService("UserInputService")
 
 local SongSelectMenu = require(game.ReplicatedStorage.Menus.SongSelectMenu)
 
+local SettingsMenu = {}
+
 function SettingsMenu:new(_local_services)
 	local self = MenuBase:new()
 	
-	local back_hit = false
+	local _do_remove = false
 
 	local _configuration = require(game.ReplicatedStorage.Configuration)
 
@@ -28,63 +28,82 @@ function SettingsMenu:new(_local_services)
 		local offset = _settings_ui.Offset
 		local notespeed = _settings_ui.Notespeed
 		local back = _settings_ui.Back
+		local keybind_buttons = {keybinds.Keybind1, keybinds.Keybind2, keybinds.Keybind3, keybinds.Keybind4}
 
 		local function updateNSMULT()
-			notespeed.Display.Text = _configuration.preferences.NoteSpeedMultiplier
+			notespeed.Display.Text = string.format("x%.1f", _configuration.preferences.NoteSpeedMultiplier)
 		end
 
 		local function updateADOFFSET()
-			offset.Display.Text = _configuration.preferences.AudioOffset
+			offset.Display.Text = string.format("%dms",_configuration.preferences.AudioOffset)
 		end
-
-		--TODO: CLEAN THIS UP
-
-		--//NOTESPEED
-		_input:bind_input_fire(notespeed.Minus, function()
-			_configuration.preferences.NoteSpeedMultiplier -= 0.1
-			updateNSMULT()
-		end)
-
-		_input:bind_input_fire(notespeed.Plus, function()
-			_configuration.preferences.NoteSpeedMultiplier += 0.1
-			updateNSMULT()
-		end)
-
-		--//OFFSET
-		_input:bind_input_fire(offset.Minus, function()
-			_configuration.preferences.AudioOffset -= 5
-			updateADOFFSET()
-		end)
-
-		_input:bind_input_fire(offset.Plus, function()
-			_configuration.preferences.AudioOffset += 5
-			updateADOFFSET()
-		end)
-
-		_input:bind_input_fire(back, function()
-			back_hit = true
-		end)
-
-		local itr_i = 0
-
-		for _, v in pairs(keybinds:GetChildren()) do
-			if v:IsA("TextButton") then
-				itr_i += 1
-				local p_i = itr_i
-				-- GO AHEAD AND SET THE TEXT TO THE PROPER KEYCODE ON INITIALIZATION
-				v.Text = _configuration.preferences.Keybinds[p_i].Name
-				_input:bind_input_fire(v, function()
-					local i = p_i
+		
+		local function updateKEYBINDS()
+			for itr_i, v in pairs(keybind_buttons) do
+				-- SET THE TEXT TO THE PROPER KEYCODE ON INITIALIZATION
+				local itr_keybinds = _configuration.preferences.Keybinds[itr_i]
+				local str = ""
+				for i_key,key in pairs(itr_keybinds) do
+					str = str .. key.Name
+					if i_key ~= #itr_keybinds then
+						str = str .. "/"
+					end
+				end
+				v.Text = str
+				SPUtil:bind_input_fire(v, function()
+					v.Text = "Press Key..."
 					local u = UserInputService.InputBegan:Wait()
-					local k = u.KeyCode
-					v.Text = k.Name
-					_configuration.preferences.Keybinds[i] = k
+					_configuration.preferences.Keybinds[itr_i] = {u.KeyCode}
 				end)
 			end
 		end
 
+		--//NOTESPEED
+		SPUtil:bind_input_fire(notespeed.Minus, function()
+			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier - 0.1
+			updateNSMULT()
+		end)
+
+		SPUtil:bind_input_fire(notespeed.Plus, function()
+			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier + 0.1
+			updateNSMULT()
+		end)
+
+		--//OFFSET
+		SPUtil:bind_input_fire(offset.Minus, function()
+			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset - 5
+			updateADOFFSET()
+		end)
+
+		SPUtil:bind_input_fire(offset.Plus, function()
+			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset + 5
+			updateADOFFSET()
+		end)
+
+		SPUtil:bind_input_fire(back, function()
+			_do_remove = true
+		end)
+
+		--//KEYBINDS
+		for itr_i, v in pairs(keybind_buttons) do
+			SPUtil:bind_input_fire(v, function()
+				v.Text = "Press Key..."
+				local u = UserInputService.InputBegan:Wait()
+				_configuration.preferences.Keybinds[itr_i] = {u.KeyCode}
+				updateKEYBINDS()
+			end)
+		end
+		
+		SPUtil:bind_input_fire(_settings_ui.Reset, function()
+			_configuration.preferences = SPUtil:copy_table(require(workspace.InitialSettings))
+			updateNSMULT()
+			updateADOFFSET()
+			updateKEYBINDS()
+		end)
+
 		updateNSMULT()
 		updateADOFFSET()
+		updateKEYBINDS()
 	end
 
 	function self:save_settings()
@@ -94,16 +113,15 @@ function SettingsMenu:new(_local_services)
 	end
 	
 	--[[Override--]] function self:update(dt_scale)
-		
 	end
 	
 	--[[Override--]] function self:should_remove()
-		return back_hit
+		return _do_remove
 	end
 	
 	--[[Override--]] function self:do_remove()
 		self:save_settings()
-		_local_services._menus:push_menu(SongSelectMenu:new(_local_services))
+		_settings_ui:Destroy()
 	end
 
 	--[[Override--]] function self:set_is_top_element(val)
