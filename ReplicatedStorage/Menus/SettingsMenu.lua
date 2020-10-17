@@ -4,10 +4,10 @@ local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
 local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
 local Networking = require(game.ReplicatedStorage.Networking)
+local Configuration = require(game.ReplicatedStorage.Configuration)
+local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
 
 local UserInputService = game:GetService("UserInputService")
-
-local SongSelectMenu = require(game.ReplicatedStorage.Menus.SongSelectMenu)
 
 local SettingsMenu = {}
 
@@ -15,8 +15,6 @@ function SettingsMenu:new(_local_services)
 	local self = MenuBase:new()
 	
 	local _do_remove = false
-
-	local _configuration = require(game.ReplicatedStorage.Configuration)
 
 	local _input = _local_services._input
 
@@ -31,17 +29,17 @@ function SettingsMenu:new(_local_services)
 		local keybind_buttons = {keybinds.Keybind1, keybinds.Keybind2, keybinds.Keybind3, keybinds.Keybind4}
 
 		local function updateNSMULT()
-			notespeed.Display.Text = string.format("x%.1f", _configuration.preferences.NoteSpeedMultiplier)
+			notespeed.Display.Text = string.format("x%.1f", Configuration.Preferences.NoteSpeedMultiplier)
 		end
 
 		local function updateADOFFSET()
-			offset.Display.Text = string.format("%dms",_configuration.preferences.AudioOffset)
+			offset.Display.Text = string.format("%dms",Configuration.Preferences.AudioOffset)
 		end
 		
 		local function updateKEYBINDS()
 			for itr_i, v in pairs(keybind_buttons) do
 				-- SET THE TEXT TO THE PROPER KEYCODE ON INITIALIZATION
-				local itr_keybinds = _configuration.preferences.Keybinds[itr_i]
+				local itr_keybinds = Configuration.Preferences.Keybinds[itr_i]
 				local str = ""
 				for i_key,key in pairs(itr_keybinds) do
 					str = str .. key.Name
@@ -53,30 +51,30 @@ function SettingsMenu:new(_local_services)
 				SPUtil:bind_input_fire(v, function()
 					v.Text = "Press Key..."
 					local u = UserInputService.InputBegan:Wait()
-					_configuration.preferences.Keybinds[itr_i] = {u.KeyCode}
+					Configuration.Preferences.Keybinds[itr_i] = {u.KeyCode}
 				end)
 			end
 		end
 
 		--//NOTESPEED
 		SPUtil:bind_input_fire(notespeed.Minus, function()
-			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier - 0.1
+			Configuration.Preferences.NoteSpeedMultiplier = Configuration.Preferences.NoteSpeedMultiplier - 0.1
 			updateNSMULT()
 		end)
 
 		SPUtil:bind_input_fire(notespeed.Plus, function()
-			_configuration.preferences.NoteSpeedMultiplier = _configuration.preferences.NoteSpeedMultiplier + 0.1
+			Configuration.Preferences.NoteSpeedMultiplier = Configuration.Preferences.NoteSpeedMultiplier + 0.1
 			updateNSMULT()
 		end)
 
 		--//OFFSET
 		SPUtil:bind_input_fire(offset.Minus, function()
-			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset - 5
+			Configuration.Preferences.AudioOffset = Configuration.Preferences.AudioOffset - 5
 			updateADOFFSET()
 		end)
 
 		SPUtil:bind_input_fire(offset.Plus, function()
-			_configuration.preferences.AudioOffset = _configuration.preferences.AudioOffset + 5
+			Configuration.Preferences.AudioOffset = Configuration.Preferences.AudioOffset + 5
 			updateADOFFSET()
 		end)
 
@@ -89,13 +87,13 @@ function SettingsMenu:new(_local_services)
 			SPUtil:bind_input_fire(v, function()
 				v.Text = "Press Key..."
 				local u = UserInputService.InputBegan:Wait()
-				_configuration.preferences.Keybinds[itr_i] = {u.KeyCode}
+				Configuration.Preferences.Keybinds[itr_i] = {u.KeyCode}
 				updateKEYBINDS()
 			end)
 		end
 		
 		SPUtil:bind_input_fire(_settings_ui.Reset, function()
-			_configuration.preferences = SPUtil:copy_table(require(workspace.InitialSettings))
+			Configuration.Preferences = SPUtil:copy_table(require(game.ReplicatedStorage.DefaultSettings))
 			updateNSMULT()
 			updateADOFFSET()
 			updateKEYBINDS()
@@ -108,7 +106,9 @@ function SettingsMenu:new(_local_services)
 
 	function self:save_settings()
 		spawn(function()
-			Networking.Client:Execute("SaveSettings", _configuration.preferences)
+			DebugOut:puts("Saving settings...")
+			Networking.Client:Execute("SaveSettings", Configuration.Preferences)
+			DebugOut:puts("Settings have been saved!")
 		end)
 	end
 	

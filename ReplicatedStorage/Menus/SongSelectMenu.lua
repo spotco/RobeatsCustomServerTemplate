@@ -9,15 +9,14 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local LeaderboardDisplay = require(game.ReplicatedStorage.Menus.Utils.LeaderboardDisplay)
 local SongStartMenu = require(game.ReplicatedStorage.Menus.SongStartMenu)
 local ConfirmationPopupMenu = require(game.ReplicatedStorage.Menus.ConfirmationPopupMenu)
+local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
+local Configuration	= require(game.ReplicatedStorage.Configuration)
+local CustomServerSettings = require(game.Workspace.CustomServerSettings)
 
 local SongSelectMenu = {}
 
 function SongSelectMenu:new(_local_services)
 	local self = MenuBase:new()
-	
-	local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
-
-	local _configuration	= require(game.ReplicatedStorage.Configuration).preferences
 
 	local _song_select_ui
 	local _selected_songkey = SongDatabase:invalid_songkey()
@@ -80,11 +79,11 @@ function SongSelectMenu:new(_local_services)
 			_local_services._menus:push_menu(SettingsMenu:new(_local_services))
 		end)
 
-		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", _configuration.CreatorName)
+		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", CustomServerSettings.CreatorName)
 		_song_select_ui.SongInfoSection.NoSongSelectedDisplay.Visible = true
 
 		MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, asset_id, is_purchased)
-			if asset_id == _configuration.SupporterGamepassID and is_purchased == true then
+			if asset_id == CustomServerSettings.SupporterGamepassID and is_purchased == true then
 				_is_supporter = true
 				self:select_songkey(_selected_songkey)
 				self:show_gamepass_menu()
@@ -92,7 +91,7 @@ function SongSelectMenu:new(_local_services)
 		end)
 		
 		spawn(function()
-			_is_supporter = MarketplaceService:UserOwnsGamePassAsync(game.Players.LocalPlayer.UserId, _configuration.SupporterGamepassID)
+			_is_supporter = MarketplaceService:UserOwnsGamePassAsync(game.Players.LocalPlayer.UserId, CustomServerSettings.SupporterGamepassID)
 			self:select_songkey(_selected_songkey)
 		end)
 	end
@@ -100,17 +99,17 @@ function SongSelectMenu:new(_local_services)
 	function self:show_gamepass_menu()
 		if _is_supporter then
 			_local_services._menus:push_menu(ConfirmationPopupMenu:new(_local_services, 
-				string.format("You are supporting %s!", _configuration.CreatorName), 
+				string.format("You are supporting %s!", CustomServerSettings.CreatorName), 
 				"Thank you for supporting this creator!", 
 				function() end):hide_back_button()
 			)
 		else
 			_local_services._menus:push_menu(ConfirmationPopupMenu:new(
 				_local_services, 
-				string.format("Support %s!", _configuration.CreatorName), 
+				string.format("Support %s!", CustomServerSettings.CreatorName), 
 				"Roblox audios are expensive to upload!\nHelp this creator by buying the Supporter Game Pass.\nBy becoming a supporter, you will get access to every song they create!", 
 				function()
-					MarketplaceService:PromptGamePassPurchase(game.Players.LocalPlayer, _configuration.SupporterGamepassID)
+					MarketplaceService:PromptGamePassPurchase(game.Players.LocalPlayer, CustomServerSettings.SupporterGamepassID)
 				end)
 			)
 		end
@@ -165,6 +164,7 @@ function SongSelectMenu:new(_local_services)
 		if val then
 			EnvironmentSetup:set_mode(EnvironmentSetup.Mode.Menu)
 			_song_select_ui.Parent = EnvironmentSetup:get_player_gui_root()
+			self:select_songkey(_selected_songkey)
 		else
 			_song_select_ui.Parent = nil
 		end

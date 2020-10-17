@@ -134,7 +134,7 @@ function SPUtil:screen_size()
 end
 
 function SPUtil:time_to_str(time)
-	return os.date("%H:%M %d-%m-%Y",time)
+	return os.date("%H:%M %d/%m/%Y",time)
 end
 
 function SPUtil:bind_input_fire(object_, callback_)

@@ -2,6 +2,7 @@ local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local SPDict = require(game.ReplicatedStorage.Shared.SPDict)
 local SPList = require(game.ReplicatedStorage.Shared.SPList)
 local SPVector = require(game.ReplicatedStorage.Shared.SPVector)
+local Configuration = require(game.ReplicatedStorage.Configuration)
 
 local InputUtil = {}
 
@@ -52,10 +53,6 @@ function InputUtil:new()
 	local _textbox_focused = false
 	local _do_textbox_unfocus = false
 
-	local _configuration = require(game.ReplicatedStorage.Configuration).preferences
-
-	local _custom_binds = _configuration.Keybinds
-
 	function self:cons()
 		userinput_service.TextBoxFocused:connect(function(textbox)
 			_textbox_focused = true
@@ -66,9 +63,6 @@ function InputUtil:new()
 
 		userinput_service.InputBegan:connect(function(input, gameProcessed)
 			if input.UserInputType == Enum.UserInputType.Keyboard then
-				if _recording_keycode_input == true then
-					return
-				end
 				self:input_began(input.KeyCode)
 
 			elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -89,11 +83,6 @@ function InputUtil:new()
 
 		userinput_service.InputEnded:connect(function(input, gameProcessed)
 			if input.UserInputType == Enum.UserInputType.Keyboard then
-				if _recording_keycode_input == true then
-					_has_recorded_keycode_input = true
-					_recorded_keycode = input.KeyCode
-					return
-				end
 				self:input_ended(input.KeyCode)
 
 			elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -269,19 +258,19 @@ function InputUtil:new()
 
 		if control == InputUtil.KEY_TRACK1 then
 			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK1) or
-				active_dict:contains_any(_custom_binds[1])
+				active_dict:contains_any(Configuration.Preferences.Keybinds[1])
 
 		elseif control == InputUtil.KEY_TRACK2 then
 			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK2) or
-				active_dict:contains_any(_custom_binds[2])
+				active_dict:contains_any(Configuration.Preferences.Keybinds[2])
 
 		elseif control == InputUtil.KEY_TRACK3 then
 			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK3) or
-				active_dict:contains_any(_custom_binds[3])
+				active_dict:contains_any(Configuration.Preferences.Keybinds[3])
 
 		elseif control == InputUtil.KEY_TRACK4 then
 			return active_dict:contains(InputUtil.KEYCODE_TOUCH_TRACK4) or
-				active_dict:contains_any(_custom_binds[4])
+				active_dict:contains_any(Configuration.Preferences.Keybinds[4])
 
 		elseif control == InputUtil.KEYCODE_TOUCH_TRACK1 then
 			return _down_keys:contains(InputUtil.KEYCODE_TOUCH_TRACK1)

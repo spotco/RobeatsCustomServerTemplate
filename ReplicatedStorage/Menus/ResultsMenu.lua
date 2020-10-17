@@ -8,13 +8,10 @@ local ResultsMenu = {}
 
 function ResultsMenu:new(_local_services, _score_data)
 	local self = MenuBase:new()
-	local _configuration	= require(game.ReplicatedStorage.Configuration).preferences
 	local _results_menu_ui
 	local _input = _local_services._input
 
-	local _back_pressed = false
-
-	-- PLEASE SIMPLIFY!
+	local _should_remove = false
 
 	local _grade_images = {
 		"http://www.roblox.com/asset/?id=5702584062",
@@ -31,13 +28,9 @@ function ResultsMenu:new(_local_services, _score_data)
 		_results_menu_ui = EnvironmentSetup:get_menu_protos_folder().ResultsMenuUI:Clone()
 
 		SPUtil:bind_input_fire(_results_menu_ui.BackButton, function()
-			_back_pressed = true
+			_should_remove = true
 		end)
-
-		self:set_data()
-	end
-
-	function self:set_data()
+		
 		local _song_key = _score_data.mapid
 		local _key_data = SongDatabase:get_data_for_key(_song_key)
 
@@ -54,10 +47,8 @@ function ResultsMenu:new(_local_services, _score_data)
 
 		_results_menu_ui.Grade.Image = img or ""
 		_results_menu_ui.Accuracy.Text = string.format("%0.2f%%", _score_data.accuracy*100)
-		--_score_data.perfects, _score_data.greats, _score_data.okays, _score_data.misses
 
 		--HANDLE SPREAD RENDERING
-
 		local _spread_display = _results_menu_ui.SpreadDisplay
 
 		local total_judges = #_key_data.HitObjects
@@ -89,9 +80,9 @@ function ResultsMenu:new(_local_services, _score_data)
 		local str = "%.2f%% | %0d / %0d / %0d / %0d"
 		return string.format(str, data.accuracy*100, data.perfects, data.greats, data.okays, data.misses)
 	end
-
-	function self:back_button_pressed()
-		
+	
+	--[[Override--]] function self:should_remove()
+		return _should_remove
 	end
 	
 	--[[Override--]] function self:do_remove()
@@ -105,10 +96,6 @@ function ResultsMenu:new(_local_services, _score_data)
 		else
 			_results_menu_ui.Parent = nil
 		end
-	end
-
-	function self:should_remove()
-		return _back_pressed
 	end
 	
 	self:cons()

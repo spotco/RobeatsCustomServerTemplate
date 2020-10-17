@@ -2,23 +2,27 @@ local DatastoreSerializer = require(game.ReplicatedStorage.Serialization.Datasto
 local Networking = require(game.ReplicatedStorage.Networking)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 
+--[[
+Use this class to access player settings. Example:
+local Configuration = require(game.ReplicatedStorage.Configuration)
+print(Configuration.Preferences.NoteSpeedMultiplier) --To access player NoteSpeedMultiplier
+]]--
+
 local Configuration = {
-		preferences = SPUtil:copy_table(require(workspace.InitialSettings))
+		Preferences = SPUtil:copy_table(require(game.ReplicatedStorage.DefaultSettings))
 }
 
 function Configuration:modify(key, value)
-		self.preferences[key] = value
+		self.Preferences[key] = value
 end
 
 function Configuration:load_from_save()
 		local suc, err = pcall(function()
 				local settings = Networking.Client:Execute("RetrieveSettings")
-
 				local deserialized = DatastoreSerializer:deserialize_table(settings or {})
-
 				if settings ~= nil then
 						for i, v in pairs(deserialized) do
-								self.preferences[i] = v
+								self.Preferences[i] = v
 						end
 				end
 		end)
