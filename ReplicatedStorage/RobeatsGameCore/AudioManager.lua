@@ -202,7 +202,7 @@ function AudioManager:new(_game)
 	local _ended_connection = nil
 
 	function self:update(dt_scale)
-		dt_scale *= _rate
+		dt_scale = dt_scale * _rate
 		if _current_mode == AudioManager.Mode.PreStart then
 			--Do pre-start countdown
 			local pre_start_time_pre = _pre_start_time_ms
