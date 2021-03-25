@@ -92,6 +92,20 @@ function SongDatabase:new()
 		return songdata.AudioDescription
 	end
 	
+	function self:get_search_string_for_key(key)
+		local data = self:get_data_for_key(key)
+		if data ~= nil then
+			local _search_data = {
+				data.AudioArtist,
+				data.AudioFilename,
+				data.AudioDifficulty
+			}
+
+			return table.concat(_search_data, " ")
+		end
+		return ""
+	end
+	
 	function self:invalid_songkey() return -1 end
 
 	self:cons()
