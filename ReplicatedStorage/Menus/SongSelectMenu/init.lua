@@ -13,6 +13,8 @@ local SettingsMenu = require(game.ReplicatedStorage.Menus.SettingsMenu)
 local Configuration	= require(game.ReplicatedStorage.Configuration)
 local CustomServerSettings = require(game.Workspace.CustomServerSettings)
 
+local withSongList = require(script.withSongList)
+
 local SongSelectMenu = {}
 
 function SongSelectMenu:new(_local_services)
@@ -21,43 +23,24 @@ function SongSelectMenu:new(_local_services)
 	local _song_select_ui
 	local _selected_songkey = SongDatabase:invalid_songkey()
 	local _is_supporter = false
-
-	local _input = _local_services._input
+	
+	local song_list
 
 	local _leaderboard_display
 	
 	function self:cons()
 		_song_select_ui = EnvironmentSetup:get_menu_protos_folder().SongSelectUI:Clone()
 		
-		local song_list = _song_select_ui.SongList
-		
-		--Expand the scrolling list to fit contents
-		song_list.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-			song_list.CanvasSize = UDim2.new(0, 0, 0, song_list.UIListLayout.AbsoluteContentSize.Y)
-		end)
-		
-		local song_list_element_proto = song_list.SongListElementProto
-		song_list_element_proto.Parent = nil
-		for itr_songkey, itr_songdata in SongDatabase:key_itr() do
-			local itr_list_element = song_list_element_proto:Clone()
-			itr_list_element.Parent = song_list
-			itr_list_element.LayoutOrder = itr_songkey
-			SongDatabase:render_coverimage_for_key(itr_list_element.SongCover, itr_list_element.SongCoverOverlay, itr_songkey)
-			itr_list_element.NameDisplay.Text = SongDatabase:get_title_for_key(itr_songkey)
-			itr_list_element.DifficultyDisplay.Text = string.format("Difficulty: %d",SongDatabase:get_difficulty_for_key(itr_songkey))
-			if SongDatabase:key_get_audiomod(itr_songkey) == SongDatabase.SongMode.SupporterOnly then
-				itr_list_element.DifficultyDisplay.Text = itr_list_element.DifficultyDisplay.Text .. " (Supporter Only)"
-			end
-			
-			SPUtil:bind_input_fire(itr_list_element, function(input)
-				self:select_songkey(itr_songkey)
-			end)
-		end
-		
 		_leaderboard_display = LeaderboardDisplay:new(
 			_song_select_ui.LeaderboardSection, 
 			_song_select_ui.LeaderboardSection.LeaderboardList.LeaderboardListElementProto
 		)
+
+		local function on_song_key_selected(key)
+			self:select_songkey(key)		
+		end
+
+		song_list = withSongList(_song_select_ui.SongList, on_song_key_selected)		
 		
 		_song_select_ui.SongInfoSection.NoSongSelectedDisplay.Visible = true
 		_song_select_ui.SongInfoSection.SongInfoDisplay.Visible = false
@@ -77,6 +60,10 @@ function SongSelectMenu:new(_local_services)
 		end)
 		SPUtil:bind_input_fire(_song_select_ui.SettingsButton, function()
 			_local_services._menus:push_menu(SettingsMenu:new(_local_services))
+		end)
+
+		_song_select_ui.SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+			song_list:filter_song_buttons(_song_select_ui.SearchBox.Text)
 		end)
 
 		_song_select_ui.NameDisplay.Text = string.format("%s's Robeats Custom Server", CustomServerSettings.CreatorName)
@@ -120,7 +107,7 @@ function SongSelectMenu:new(_local_services)
 		_song_select_ui.SongInfoSection.NoSongSelectedDisplay.Visible = false
 		_selected_songkey = songkey
 		
-		SongDatabase:render_coverimage_for_key(_song_select_ui.SongInfoSection.SongInfoDisplay.SongCover, _song_select_ui.SongInfoSection.SongInfoDisplay.SongCoverOverlay, _selected_songkey)
+		-- SongDatabase:render_coverimage_for_key(_song_select_ui.SongInfoSection.SongInfoDisplay.SongCover, _song_select_ui.SongInfoSection.SongInfoDisplay.SongCoverOverlay, _selected_songkey)
 		_song_select_ui.SongInfoSection.SongInfoDisplay.NameDisplay.Text = SongDatabase:get_title_for_key(_selected_songkey)
 		_song_select_ui.SongInfoSection.SongInfoDisplay.DifficultyDisplay.Text = string.format("Difficulty: %d",SongDatabase:get_difficulty_for_key(_selected_songkey))
 		_song_select_ui.SongInfoSection.SongInfoDisplay.ArtistDisplay.Text = SongDatabase:get_artist_for_key(_selected_songkey)
@@ -166,7 +153,13 @@ function SongSelectMenu:new(_local_services)
 			_song_select_ui.Parent = EnvironmentSetup:get_player_gui_root()
 			self:select_songkey(_selected_songkey)
 		else
-			_song_select_ui.Parent = nil
+			if val then
+				EnvironmentSetup:set_mode(EnvironmentSetup.Mode.Menu)
+				_song_select_ui.Parent = EnvironmentSetup:get_player_gui_root()
+				self:select_songkey(_selected_songkey)
+			else
+				_song_select_ui.Parent = nil
+			end
 		end
 	end
 	
