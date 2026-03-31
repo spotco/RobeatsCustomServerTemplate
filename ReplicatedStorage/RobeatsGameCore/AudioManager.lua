@@ -96,6 +96,7 @@ function AudioManager:new(_game)
 	local _load_retry_elapsed_sec = 0
 	local _load_retry_count = 0
 
+	local _force_silent_fallback = false
 	-- Used when Sound.TimeLength is unavailable (approximate from map metadata).
 	local _fallback_song_length_ms = 0
 
@@ -134,6 +135,7 @@ function AudioManager:new(_game)
 		_load_retry_count = 0
 		_pre_start_time_ms = 0
 		_post_playing_time_ms = 0
+		_force_silent_fallback = false
 		_fallback_song_length_ms = 0
 		_raise_pre_start_trigger = false
 		_raise_pre_start_trigger_val = 0
@@ -163,6 +165,7 @@ function AudioManager:new(_game)
 		_bgm.PlaybackSpeed = 0
 		_bgm.TimePosition = 0
 		_bgm_time_position = 0
+		_force_silent_fallback = false
 		-- Approximate: last note time plus a small buffer.
 		_fallback_song_length_ms = (_current_audio_data.LastNoteTime or 0) + 1000
 
@@ -186,12 +189,27 @@ function AudioManager:new(_game)
 		end
 		_current_audio_data = nil
 		_hit_sfx_group = nil
+		_force_silent_fallback = false
 		_fallback_song_length_ms = 0
 		_bgm:Destroy()
 	end
 
+	function self:force_silent_fallback()
+		if _current_audio_data == nil then
+			return
+		end
+		if _force_silent_fallback ~= true then
+			_force_silent_fallback = true
+			DebugOut:warnf("AudioManager forcing silent fallback for song_key(%s) soundid(%s)", tostring(_song_key), tostring(_bgm.SoundId))
+		end
+	end
+
+	function self:is_silent_fallback_active()
+		return _force_silent_fallback == true
+	end
+
 	function self:is_ready_to_play()
-		return _current_audio_data ~= nil and _bgm.IsLoaded == true
+		return _current_audio_data ~= nil and (_bgm.IsLoaded == true or _force_silent_fallback == true)
 	end
 
 	function self:is_prestart() return _current_mode == AudioManager.Mode.PreStart end
@@ -331,19 +349,25 @@ function AudioManager:new(_game)
 			end
 
 			if _pre_start_time_ms >= _pre_countdown_time_ms then
-				_bgm.TimePosition = 0
-				_bgm.Volume = _audio_volume
-				_bgm.PlaybackSpeed = _rate
 				_bgm_time_position = 0
-				_bgm_time_position_last = 0
-				_playing_time_sec = 0
-				_load_retry_elapsed_sec = 0
+				if _force_silent_fallback == true then
+					-- Keep the Sound muted/stopped; gameplay time advances locally without audio.
+					_bgm.Volume = 0
+					_bgm.PlaybackSpeed = 0
+				else
+					_bgm.TimePosition = 0
+					_bgm.Volume = _audio_volume
+					_bgm.PlaybackSpeed = _rate
+					_bgm_time_position_last = 0
+					_playing_time_sec = 0
+					_load_retry_elapsed_sec = 0
 
-				_ended_connection = _bgm.Ended:Connect(function()
-					_raise_ended_trigger = true
-					_ended_connection:Disconnect()
-					_ended_connection = nil
-				end)
+					_ended_connection = _bgm.Ended:Connect(function()
+						_raise_ended_trigger = true
+						_ended_connection:Disconnect()
+						_ended_connection = nil
+					end)
+				end
 
 				_current_mode = AudioManager.Mode.Playing
 			end
@@ -351,6 +375,15 @@ function AudioManager:new(_game)
 			self:update_spawn_notes(dt_scale)
 
 		elseif _current_mode == AudioManager.Mode.Playing then
+			self:update_spawn_notes(dt_scale)
+			if _force_silent_fallback == true then
+				_bgm_time_position = _bgm_time_position + CurveUtil:TimescaleToDeltaTime(dt_scale)
+				if _bgm_time_position * 1000 >= _fallback_song_length_ms then
+					_current_mode = AudioManager.Mode.PostPlaying
+				end
+				return
+			end
+
 			if self:should_playing_game_flag_as_end() then
 				_current_mode = AudioManager.Mode.PostPlaying
 				return
@@ -372,7 +405,6 @@ function AudioManager:new(_game)
 			-- Advance stored time even while audio is loading, so gameplay doesn't freeze.
 			if is_playing ~= true or (sound_delta > 0 or time_pos > 0) then
 				_bgm_time_position = _bgm_time_position + stored_dt_sec
-				self:update_spawn_notes(dt_scale)
 
 				if _bgm.IsLoaded == false then
 					_load_retry_elapsed_sec = _load_retry_elapsed_sec + dt_sec
@@ -468,9 +500,9 @@ function AudioManager:new(_game)
 
 	function self:get_song_length_ms()
 		local song_length_ms = _bgm.TimeLength * 1000
-		if song_length_ms <= 0 then
-			song_length_ms = _fallback_song_length_ms
-		else
+		if _force_silent_fallback == true or song_length_ms <= 0 then
+			song_length_ms = math.max(song_length_ms, _fallback_song_length_ms)
+		elseif song_length_ms > 0 then
 			song_length_ms = math.max(song_length_ms, _fallback_song_length_ms)
 		end
 		return song_length_ms + _pre_countdown_time_ms

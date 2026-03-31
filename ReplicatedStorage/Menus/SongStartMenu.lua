@@ -6,6 +6,7 @@ local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local InGameMenu = require(game.ReplicatedStorage.Menus.InGameMenu)
 
 local SongStartMenu = {}
+local LOAD_TIMEOUT_SEC = 20
 local LOAD_RETRY_SEC = 10
 
 function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
@@ -44,8 +45,16 @@ function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
 			end
 		end
 
+		if _loading_time_sec >= LOAD_TIMEOUT_SEC and _game._audio_manager:is_ready_to_play() ~= true then
+			_game._audio_manager:force_silent_fallback()
+		end
+
 		_loading_ui.TimeDisplay.Text = string.format("Loading (%d)...", math.floor(_loading_time_sec))
-		_loading_ui.AssetDisplay.Text = string.format("SoundId(%s)", _game._audio_manager:get_bgm().SoundId)
+		if _game._audio_manager:is_silent_fallback_active() == true then
+			_loading_ui.AssetDisplay.Text = string.format("SoundId(%s) [no audio]", _game._audio_manager:get_bgm().SoundId)
+		else
+			_loading_ui.AssetDisplay.Text = string.format("SoundId(%s)", _game._audio_manager:get_bgm().SoundId)
+		end
 	end
 	
 	function self:should_remove()
