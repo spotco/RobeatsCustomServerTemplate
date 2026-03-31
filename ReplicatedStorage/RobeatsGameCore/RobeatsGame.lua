@@ -12,6 +12,10 @@ local GameSlot = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameSlot)
 local GameTrack = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameTrack)
 local DebugOut = require(game.ReplicatedStorage.Shared.DebugOut)
 local AssertType = require(game.ReplicatedStorage.Shared.AssertType)
+local Configuration = require(game.ReplicatedStorage.Configuration)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local RobeatsGame = {}
 RobeatsGame.Mode = {
@@ -38,9 +42,9 @@ function RobeatsGame:new(local_services, _game_environment_center_position)
 	
 	local _current_mode = RobeatsGame.Mode.Setup
 	function self:get_mode() return _current_mode end
-	function self:set_mode(val) 
+	function self:set_mode(val)
 		AssertType:is_enum_member(val, RobeatsGame.Mode)
-		_current_mode = val 
+		_current_mode = val
 	end
 
 	function self:get_game_environment_center_position()
@@ -49,7 +53,23 @@ function RobeatsGame:new(local_services, _game_environment_center_position)
 
 	function self:setup_world(game_slot)
 		_local_game_slot = game_slot
-		workspace.CurrentCamera.CFrame = GameSlot:slot_to_camera_cframe_offset(self:get_local_game_slot()) + self:get_game_environment_center_position()
+
+		local base_cframe = GameSlot:slot_to_camera_cframe_offset(self:get_local_game_slot()) + self:get_game_environment_center_position()
+		if (SPUtil:is_mobile() == true or (RunService:IsStudio() and ReplicatedStorage:GetAttribute("StudioMobileSimulation") == true))
+			and Configuration.Preferences.MobileFullScreenUI ~= false then
+			local screen_size = SPUtil:screen_size()
+			local aspect = screen_size.X / math.max(1, screen_size.Y)
+
+			local t = CurveUtil:YForPointOf2PtLine(Vector2.new(2.1041095890410957, 0), Vector2.new(1.3333333333333333, 1), aspect)
+			t = math.clamp(t, 0, 1)
+
+			local offset_vec = Vector3.new(0, -1, -10):Lerp(Vector3.new(0, 2, -7), t)
+			local rot = base_cframe - base_cframe.p
+			local pos = base_cframe.p + rot * offset_vec
+			base_cframe = CFrame.new(pos, pos + rot * Vector3.new(0, -0.325, -1))
+		end
+
+		workspace.CurrentCamera.CFrame = base_cframe
 		workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
 		workspace.CurrentCamera.CameraSubject = nil
 	end
@@ -81,11 +101,9 @@ function RobeatsGame:new(local_services, _game_environment_center_position)
 					self:get_local_tracksystem():release_track_index(itr_index)
 				end
 			end
-			
 			for slot,itr in self._tracksystems:key_itr() do
 				itr:update(dt_scale)
 			end
-			
 			self._effects:update(dt_scale)
 			self._score_manager:update(dt_scale)
 		end

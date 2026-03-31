@@ -1,5 +1,6 @@
 local MenuBase = require(game.ReplicatedStorage.Menus.System.MenuBase)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
+local TouchTrackDisplay = require(game.ReplicatedStorage.RobeatsGameCore.TouchTrackDisplay)
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local RobeatsGame = require(game.ReplicatedStorage.RobeatsGameCore.RobeatsGame)
 local AudioManager = require(game.ReplicatedStorage.RobeatsGameCore.AudioManager)
@@ -15,12 +16,14 @@ function InGameMenu:new(_local_services, _game, _song_key)
 	local self = MenuBase:new()
 	
 	local _stat_display_ui
+	local _touch_track_display
 
 	local _force_quit = false
 	
 	function self:cons()
 		_stat_display_ui = EnvironmentSetup:get_menu_protos_folder().InGameMenuStatDisplayUI:Clone()
 		_stat_display_ui.Parent = EnvironmentSetup:get_player_gui_root()
+		_touch_track_display = TouchTrackDisplay:new(_game)
 		
 		_stat_display_ui.ExitButton.Activated:Connect(function()
 			if _game._audio_manager:get_mode() == AudioManager.Mode.Playing then
@@ -30,8 +33,11 @@ function InGameMenu:new(_local_services, _game, _song_key)
 		end)
 	end
 	
-	--[[Override--]] function self:update(dt_scale)
+	function self:update(dt_scale)
 		_game:update(dt_scale)
+		if _touch_track_display ~= nil then
+			_touch_track_display:update(dt_scale)
+		end
 		
 		if _game._audio_manager:get_mode() == AudioManager.Mode.PreStart then
 			local did_raise_pre_start_trigger, raise_pre_start_trigger_val, raise_pre_start_trigger_duration = _game._audio_manager:raise_pre_start_trigger()
@@ -56,16 +62,19 @@ function InGameMenu:new(_local_services, _game, _song_key)
 		_stat_display_ui.TimeLeftDisplay.Text = SPUtil:format_ms_time(ms_remaining)
 	end
 	
-	--[[Override--]] function self:should_remove()
+	function self:should_remove()
 		return _game:get_mode() == RobeatsGame.Mode.GameEnded
 	end
 	
-	--[[Override--]] function self:do_remove()
+	function self:do_remove()
+		if _touch_track_display ~= nil then
+			_touch_track_display:teardown()
+			_touch_track_display = nil
+		end
 		_stat_display_ui:Destroy()
 		
 		local perf_count, great_count, okay_count, miss_count, max_combo = _game._score_manager:get_end_records()
 		local accuracy = _game._score_manager:get_accuracy()
-
 
 		local data = {
 			mapid = _song_key;
@@ -90,6 +99,14 @@ function InGameMenu:new(_local_services, _game, _song_key)
 		_game:teardown()
 
 		_local_services._menus:push_menu(ResultsMenu:new(_local_services, data))
+	end
+
+	function self:set_is_top_element(val)
+		if val then
+			_stat_display_ui.Parent = EnvironmentSetup:get_player_gui_root()
+		else
+			_stat_display_ui.Parent = nil
+		end
 	end
 	
 	self:cons()

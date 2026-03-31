@@ -22,4 +22,9 @@ return {
 		NoteRemoveTimeMS = -200;
 		PostFinishWaitTimeMS = 300;
 		PreStartCountdownTimeMS = 3000;
+
+		-- Mobile UI defaults
+		MobileFullScreenUI = true;
+		-- 0 = Default, 1 = On, 2 = Off
+		MobileShowTouchControls = 0;
 }

@@ -6,6 +6,7 @@ local CurveUtil = require(game.ReplicatedStorage.Shared.CurveUtil)
 local InGameMenu = require(game.ReplicatedStorage.Menus.InGameMenu)
 
 local SongStartMenu = {}
+local LOAD_RETRY_SEC = 10
 
 function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
 	local self = MenuBase:new()
@@ -13,6 +14,7 @@ function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
 	local _game
 	local _loading_ui
 	local _loading_time_sec = 0
+	local _load_retry_elapsed_sec = 0
 	local _back_button_pressed = false
 	
 	function self:cons()
@@ -23,23 +25,34 @@ function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
 		
 		EnvironmentSetup:set_mode(EnvironmentSetup.Mode.Game)
 		
-		_game = RobeatsGame:new(_local_services, EnvironmentSetup:get_game_environment_center_position(), self)
+		_game = RobeatsGame:new(_local_services, EnvironmentSetup:get_game_environment_center_position())
 		_game._audio_manager:load_song(_start_song_key)
 		_game:setup_world(_local_player_slot)
 	end
 	
-	--[[Override--]] function self:update(dt_scale)
+	function self:update(dt_scale)
 		_game:update(dt_scale)
-		_loading_time_sec = _loading_time_sec + CurveUtil:TimescaleToDeltaTime(dt_scale)
+		local dt_sec = CurveUtil:TimescaleToDeltaTime(dt_scale)
+		_loading_time_sec = _loading_time_sec + dt_sec
+
+		-- If audio is stuck loading, retry by recreating the Sound periodically.
+		if _game._audio_manager:is_ready_to_play() ~= true then
+			_load_retry_elapsed_sec = _load_retry_elapsed_sec + dt_sec
+			if _load_retry_elapsed_sec >= LOAD_RETRY_SEC then
+				_load_retry_elapsed_sec = 0
+				_game._audio_manager:load_retry()
+			end
+		end
+
 		_loading_ui.TimeDisplay.Text = string.format("Loading (%d)...", math.floor(_loading_time_sec))
 		_loading_ui.AssetDisplay.Text = string.format("SoundId(%s)", _game._audio_manager:get_bgm().SoundId)
 	end
 	
-	--[[Override--]] function self:should_remove()
+	function self:should_remove()
 		return _game._audio_manager:is_ready_to_play() == true or _back_button_pressed
 	end
 	
-	--[[Override--]] function self:do_remove()
+	function self:do_remove()
 		_loading_ui:Destroy()
 		if _back_button_pressed == true then
 			_game:teardown()
@@ -49,7 +62,7 @@ function SongStartMenu:new(_local_services, _start_song_key, _local_player_slot)
 		end
 	end
 	
-	--[[Override--]] function self:set_is_top_element(val)
+	function self:set_is_top_element(val)
 		if val then
 			_loading_ui.Parent = EnvironmentSetup:get_player_gui_root()
 		else
