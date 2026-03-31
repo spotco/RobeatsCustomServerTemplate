@@ -4,8 +4,6 @@ local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local Configuration = require(game.ReplicatedStorage.Configuration)
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local TouchTrackDisplay = {}
@@ -25,16 +23,16 @@ local TRACK_KEYS = {
 }
 
 local function is_touch_mode_enabled()
-	return UserInputService.TouchEnabled == true
-		or SPUtil:is_mobile() == true
-		or (RunService:IsStudio() and ReplicatedStorage:GetAttribute("StudioMobileSimulation") == true)
+	return UserInputService.TouchEnabled == true or SPUtil:is_mobile_like() == true
 end
 
 local function is_upclose_mode_enabled()
+	-- Default to Upclose unless explicitly disabled.
 	return Configuration.Preferences.MobileFullScreenUI ~= false
 end
 
 local function should_show_touch_controls()
+	-- 0=Default, 1=On, 2=Off
 	local setting = tonumber(Configuration.Preferences.MobileShowTouchControls) or 0
 	return setting ~= 2
 end

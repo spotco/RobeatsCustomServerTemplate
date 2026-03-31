@@ -4,7 +4,14 @@ local SPList = require(game.ReplicatedStorage.Shared.SPList)
 local SPVector = require(game.ReplicatedStorage.Shared.SPVector)
 local Configuration = require(game.ReplicatedStorage.Configuration)
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
 local InputUtil = {}
+
+local function is_studio_mobile_simulation_enabled()
+	return SPUtil:is_studio_mobile_simulation_enabled() == true
+end
 
 InputUtil.KEY_TRACK1 = 0
 InputUtil.KEY_TRACK2 = 1
@@ -52,6 +59,8 @@ function InputUtil:new()
 
 	local _textbox_focused = false
 	local _do_textbox_unfocus = false
+	local _studio_sim_mouse_touch_down = false
+	local _studio_sim_touch_seq = ReplicatedStorage:GetAttribute("StudioSimTouchSeq") or 0
 
 	function self:cons()
 		userinput_service.TextBoxFocused:connect(function(textbox)
@@ -67,6 +76,10 @@ function InputUtil:new()
 
 			elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
 				self:input_began(InputUtil.KEY_CLICK)
+				if is_studio_mobile_simulation_enabled() then
+					_studio_sim_mouse_touch_down = true
+					self:touch_began(input.Position.X, input.Position.Y)
+				end
 
 			elseif input.UserInputType == Enum.UserInputType.Touch then
 				self:input_began(InputUtil.KEY_CLICK)
@@ -78,6 +91,8 @@ function InputUtil:new()
 		userinput_service.InputChanged:connect(function(input, gameProcessed)
 			if input.UserInputType == Enum.UserInputType.Touch then
 				self:touch_changed(input.Position.X, input.Position.Y)
+			elseif input.UserInputType == Enum.UserInputType.MouseMovement and _studio_sim_mouse_touch_down and is_studio_mobile_simulation_enabled() then
+				self:touch_changed(input.Position.X, input.Position.Y)
 			end
 		end)
 
@@ -87,6 +102,12 @@ function InputUtil:new()
 
 			elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
 				self:input_ended(InputUtil.KEY_CLICK)
+				if _studio_sim_mouse_touch_down then
+					_studio_sim_mouse_touch_down = false
+					if is_studio_mobile_simulation_enabled() then
+						self:touch_ended(input.Position.X, input.Position.Y)
+					end
+				end
 
 			elseif input.UserInputType == Enum.UserInputType.Touch then
 				self:input_ended(InputUtil.KEY_CLICK)
@@ -244,6 +265,30 @@ function InputUtil:new()
 			_textbox_focused = false
 		end
 		self:set_has_frame_focused_element(false)
+
+		if is_studio_mobile_simulation_enabled() then
+			local next_seq = ReplicatedStorage:GetAttribute("StudioSimTouchSeq") or 0
+			if next_seq ~= _studio_sim_touch_seq then
+				_studio_sim_touch_seq = next_seq
+				local action = ReplicatedStorage:GetAttribute("StudioSimTouchAction")
+				local x = ReplicatedStorage:GetAttribute("StudioSimTouchX") or 0
+				local y = ReplicatedStorage:GetAttribute("StudioSimTouchY") or 0
+				if action == "began" then
+					self:input_began(InputUtil.KEY_CLICK)
+					self:touch_began(x, y)
+				elseif action == "changed" then
+					self:touch_changed(x, y)
+				elseif action == "ended" then
+					self:input_ended(InputUtil.KEY_CLICK)
+					self:touch_ended(x, y)
+				elseif action == "tap" then
+					self:input_began(InputUtil.KEY_CLICK)
+					self:touch_began(x, y)
+					self:input_ended(InputUtil.KEY_CLICK)
+					self:touch_ended(x, y)
+				end
+			end
+		end
 	end
 
 	local function is_control_active(control,active_dict)

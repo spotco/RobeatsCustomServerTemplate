@@ -1,4 +1,7 @@
 local RandomLua = require(game.ReplicatedStorage.Shared.RandomLua)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local SPUtil = {}
 
@@ -96,7 +99,26 @@ function SPUtil:look_at(eye, target)
 end
 
 function SPUtil:is_mobile()
-	return game:GetService("UserInputService").TouchEnabled
+	if UserInputService.TouchEnabled ~= true then
+		return false
+	end
+
+	-- Roblox's mobile input guidance recommends checking the active input when multiple
+	-- input sources are available, since desktop touchscreens and mobile keyboard/mouse
+	-- setups can both exist.
+	if UserInputService.KeyboardEnabled == true or UserInputService.MouseEnabled == true then
+		return UserInputService:GetLastInputType() == Enum.UserInputType.Touch
+	end
+
+	return true
+end
+
+function SPUtil:is_studio_mobile_simulation_enabled()
+	return RunService:IsStudio() and ReplicatedStorage:GetAttribute("StudioMobileSimulation") == true
+end
+
+function SPUtil:is_mobile_like()
+	return SPUtil:is_mobile() == true or SPUtil:is_studio_mobile_simulation_enabled() == true
 end
 
 local _sputil_screengui = nil
