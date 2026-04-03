@@ -129,6 +129,7 @@ function AudioManager:new(_game)
 	function self:load_song(song_key)
 		-- Drop large per-song data from any previously loaded map to avoid memory growth.
 		if _song_key ~= 0 and _song_key ~= song_key then
+			SongDatabase:unpin_data_for_key(_song_key)
 			SongDatabase:release_data_for_key(_song_key)
 		end
 
@@ -145,6 +146,7 @@ function AudioManager:new(_game)
 
 		_audio_time_offset = _base_audio_time_offset
 		_current_audio_data = SongDatabase:get_data_for_key(_song_key)
+		SongDatabase:pin_data_for_key(_song_key)
 		for i=1,#_current_audio_data.HitObjects do
 			local itr = _current_audio_data.HitObjects[i]
 			if itr.Type == 1 then
@@ -182,6 +184,7 @@ function AudioManager:new(_game)
 			_ended_connection = nil
 		end
 		if _song_key ~= 0 then
+			SongDatabase:unpin_data_for_key(_song_key)
 			SongDatabase:release_data_for_key(_song_key)
 		end
 		_bgm:Destroy()

@@ -11,6 +11,10 @@ SongDatabase.SongMode = {
     SupporterOnly = 1;
 }
 
+-- Maximum number of charts allowed to remain fully loaded at once.
+-- This prevents downstream templates from accidentally loading every map's note data and keeping it resident.
+local MAX_LOADED_CHARTS = 2
+
 local function shallow_copy(data)
     local copy = {}
     for key, value in pairs(data) do
@@ -85,6 +89,57 @@ function SongDatabase:new()
     local _key_list = SPList:new()
     local _name_to_key = SPDict:new()
     local _key_to_modulescript = SPDict:new()
+    local _pin_counts = {}
+    local _loaded_lru = {} -- least-recently-used to most-recently-used
+    local _loaded_index = {}
+
+    local function is_pinned(key)
+        return (_pin_counts[key] or 0) > 0
+    end
+
+    local function lru_remove_key(key)
+        local idx = _loaded_index[key]
+        if idx == nil then
+            return
+        end
+        table.remove(_loaded_lru, idx)
+        _loaded_index[key] = nil
+        -- Rebuild indices after removal (small N, simple and safe).
+        for i = idx, #_loaded_lru do
+            _loaded_index[_loaded_lru[i]] = i
+        end
+    end
+
+    local function lru_touch_key(key)
+        local idx = _loaded_index[key]
+        if idx ~= nil then
+            table.remove(_loaded_lru, idx)
+            _loaded_index[key] = nil
+            for i = idx, #_loaded_lru do
+                _loaded_index[_loaded_lru[i]] = i
+            end
+        end
+        table.insert(_loaded_lru, key)
+        _loaded_index[key] = #_loaded_lru
+    end
+
+    local function enforce_loaded_cap(exclude_key)
+        while #_loaded_lru > MAX_LOADED_CHARTS do
+            local evicted = false
+            for i = 1, #_loaded_lru do
+                local key = _loaded_lru[i]
+                if key ~= exclude_key and is_pinned(key) ~= true then
+                    self:release_data_for_key(key)
+                    evicted = true
+                    break
+                end
+            end
+            if evicted ~= true then
+                -- Everything remaining is pinned; we can't evict without risking active gameplay.
+                break
+            end
+        end
+    end
 
     local function get_or_build_header(songModule)
         return build_header_from_songdata(load_songmodule_clone(songModule))
@@ -99,12 +154,30 @@ function SongDatabase:new()
 
         local loadedSongData = load_songmodule_clone(songModule)
         data.Loaded = true
-        data.HitObjects = loadedSongData.HitObjects or {}
-        data.TimingPoints = loadedSongData.TimingPoints or {}
+        -- Keep table identity stable so any cached references see releases (table.clear) correctly.
+        if data.HitObjects == nil then data.HitObjects = {} end
+        if data.TimingPoints == nil then data.TimingPoints = {} end
+
+        table.clear(data.HitObjects)
+        table.clear(data.TimingPoints)
+
+        local hitObjects = loadedSongData.HitObjects or {}
+        for i = 1, #hitObjects do
+            data.HitObjects[i] = hitObjects[i]
+        end
+
+        local timingPoints = loadedSongData.TimingPoints or {}
+        for i = 1, #timingPoints do
+            data.TimingPoints[i] = timingPoints[i]
+        end
+
         data.HitCount = loadedSongData.HitCount or data.HitCount or calculate_hit_count(data.HitObjects)
         data.HitObjectsCount = loadedSongData.HitObjectsCount or data.HitObjectsCount or #data.HitObjects
         data.LastNoteTime = loadedSongData.LastNoteTime or data.LastNoteTime or calculate_last_note_time(data.HitObjects)
         data.BPM = loadedSongData.BPM or data.BPM or calculate_bpm(data.TimingPoints)
+
+        lru_touch_key(key)
+        enforce_loaded_cap(key)
         return data
     end
 
@@ -152,6 +225,8 @@ function SongDatabase:new()
         end
         if data.Loaded ~= true then
             data = load_chart_data_for_key(key)
+        else
+            lru_touch_key(key)
         end
         return data
     end
@@ -161,14 +236,31 @@ function SongDatabase:new()
         return data ~= nil and data.Loaded == true
     end
 
+    function self:pin_data_for_key(key)
+        _pin_counts[key] = (_pin_counts[key] or 0) + 1
+    end
+
+    function self:unpin_data_for_key(key)
+        local cur = _pin_counts[key] or 0
+        cur = cur - 1
+        if cur <= 0 then
+            _pin_counts[key] = nil
+        else
+            _pin_counts[key] = cur
+        end
+    end
+
     function self:release_data_for_key(key)
         local data = _all_keys:get(key)
         if data == nil then
             return
         end
-        data.HitObjects = {}
-        data.TimingPoints = {}
+        if data.HitObjects == nil then data.HitObjects = {} end
+        if data.TimingPoints == nil then data.TimingPoints = {} end
+        table.clear(data.HitObjects)
+        table.clear(data.TimingPoints)
         data.Loaded = false
+        lru_remove_key(key)
     end
 
     function self:contains_key(key)
