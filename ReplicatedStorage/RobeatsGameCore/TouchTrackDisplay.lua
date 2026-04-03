@@ -91,8 +91,8 @@ function TouchTrackDisplay:new(robeatsGame)
 			return nil
 		end
 
-		local viewportSize = camera.ViewportSize
-		if viewportSize.X <= 0 then
+		local screenSizeX = SPUtil:screen_size().X
+		if screenSizeX <= 0 then
 			return nil
 		end
 
@@ -101,8 +101,9 @@ function TouchTrackDisplay:new(robeatsGame)
 			return nil
 		end
 
-		local screenPoint = camera:WorldToViewportPoint(track:get_end_position())
-		return screenPoint.X / viewportSize.X
+		-- Normalize to the same screen width that touch input uses (InputUtil uses SPUtil:screen_size().X).
+		local screenPoint = camera:WorldToScreenPoint(track:get_end_position())
+		return screenPoint.X / screenSizeX
 	end
 
 	local function compute_touch_ends()

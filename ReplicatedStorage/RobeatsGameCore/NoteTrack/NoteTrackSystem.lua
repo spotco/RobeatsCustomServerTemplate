@@ -7,6 +7,7 @@ local GameTrack = require(game.ReplicatedStorage.RobeatsGameCore.Enums.GameTrack
 local SPUtil = require(game.ReplicatedStorage.Shared.SPUtil)
 local EnvironmentSetup = require(game.ReplicatedStorage.RobeatsGameCore.EnvironmentSetup)
 local HitParams = require(game.ReplicatedStorage.RobeatsGameCore.HitParams)
+local Configuration = require(game.ReplicatedStorage.Configuration)
 
 local NoteTrackSystem = {}
 
@@ -28,6 +29,48 @@ function NoteTrackSystem:new(_game, _game_slot)
 			_game:get_game_environment_center_position(),
 			_game:get_game_environment_center_position() + GameSlot:slot_to_world_position_offset(_game_slot)
 		))
+
+		if SPUtil:is_mobile_like() == true and Configuration.Preferences.MobileFullScreenUI ~= false then
+			local center = _game:get_game_environment_center_position()
+			local target = center + GameSlot:slot_to_world_position_offset(_game_slot)
+			local dirXZ = Vector3.new(target.X - center.X, 0, target.Z - center.Z)
+			local mag = dirXZ.Magnitude
+			if mag > 0 then
+				local base_deg = SPUtil:dir_ang_deg(dirXZ.X, dirXZ.Z)
+				local spread_deg = 8
+				local multipliers = { 1.5, 0.5, -0.5, -1.5 }
+				local base_dir2 = SPUtil:ang_deg_dir(base_deg)
+				local base_dir = Vector3.new(base_dir2.X, 0, base_dir2.Y)
+				for i = 1, 4 do
+					local trackModel = _obj:FindFirstChild(string.format("Track%d", i))
+					if trackModel ~= nil and trackModel:IsA("Model") then
+						local offset_deg = spread_deg * multipliers[i]
+						local pos_dir2 = SPUtil:ang_deg_dir(base_deg + offset_deg)
+						local posXZ = Vector3.new(pos_dir2.X, 0, pos_dir2.Y) * (mag * 0.5) + center
+						local track_center = Vector3.new(posXZ.X, center.Y + 0.5, posXZ.Z)
+
+						local trackPart = trackModel:FindFirstChild("PlayerTrackProto")
+						if trackPart ~= nil and trackPart:IsA("BasePart") then
+							trackPart.Size = Vector3.new(0.5, mag, 0.25)
+							trackPart.Transparency = 0.5
+							trackPart.Position = track_center + Vector3.new(0, -0.85, 0)
+							trackPart.Rotation = Vector3.new(0, -base_deg - 180, 90)
+						end
+
+						local startMarker = trackModel:FindFirstChild("StartPosition")
+						if startMarker ~= nil and startMarker:IsA("BasePart") then
+							startMarker.Position = track_center + base_dir * (-mag * 0.5)
+						end
+
+						local endMarker = trackModel:FindFirstChild("EndPosition")
+						if endMarker ~= nil and endMarker:IsA("BasePart") then
+							endMarker.Position = track_center + base_dir * (mag * 0.5 * 0.1)
+						end
+					end
+				end
+			end
+		end
+
 		_obj.Parent = EnvironmentSetup:get_local_elements_folder()
 		
 		--For every defined enum value in GameTrack, create a NoteTrack for it
