@@ -58,6 +58,7 @@ function AudioManager:new(_game)
 
 	--Audio offset is milliseconds
 	local _audio_time_offset = Configuration.Preferences.AudioOffset
+	local _base_audio_time_offset = _audio_time_offset
 	
 	--The game audio
 	local function create_bgm()
@@ -88,24 +89,10 @@ function AudioManager:new(_game)
 	local _post_playing_time_ms = 0
 	local _audio_volume = 0.5
 
-	-- Track Sound.TimePosition deltas and keep our own stored time, so we can recover from stalls/jitter.
-	local _bgm_time_position_last = 0
-	local _playing_time_sec = 0
-
-	-- If audio stays unloaded, periodically retry by recreating the Sound (same approach as the other instance).
-	local _load_retry_elapsed_sec = 0
-	local _load_retry_count = 0
-
+	-- If audio never loads, allow gameplay to continue without it by advancing time locally.
 	local _force_silent_fallback = false
-	-- Used when Sound.TimeLength is unavailable (approximate from map metadata).
 	local _fallback_song_length_ms = 0
-
-	local _raise_pre_start_trigger = false
-	local _raise_pre_start_trigger_val = 0
-	local _raise_pre_start_trigger_duration = 0
-	local _raise_ended_trigger = false
-	local _raise_just_finished = false
-	-- We re-create the Sound each game; keep the Ended connection cleaned up across reloads.
+	local _load_retry_count = 0
 	local _ended_connection = nil
 
 	local _song_key = 0
@@ -113,13 +100,35 @@ function AudioManager:new(_game)
 
 	local _note_count = 0
 	function self:get_note_count() return _note_count end
-	function self:load_song(song_key)
-		if _ended_connection ~= nil then
-			_ended_connection:Disconnect()
-			_ended_connection = nil
+
+	local function compute_fallback_song_length_ms(audio_data)
+		if audio_data == nil then
+			return 0
 		end
+
+		if audio_data.LastNoteTime ~= nil then
+			return math.max((audio_data.LastNoteTime or 0) + 1000, 1000)
+		end
+
+		local max_time = 0
+		if audio_data.HitObjects ~= nil then
+			for i = 1, #audio_data.HitObjects do
+				local obj = audio_data.HitObjects[i]
+				local t = obj.Time or 0
+				if obj.Type == 2 then
+					t = t + (obj.Duration or 0)
+				end
+				if t > max_time then
+					max_time = t
+				end
+			end
+		end
+		return math.max(max_time + 1000, 1000)
+	end
+
+	function self:load_song(song_key)
+		-- Drop large per-song data from any previously loaded map to avoid memory growth.
 		if _song_key ~= 0 and _song_key ~= song_key then
-			-- Release old song data (paired with SongDatabase:get_data_for_key) to avoid growth across loads.
 			SongDatabase:release_data_for_key(_song_key)
 		end
 
@@ -129,20 +138,12 @@ function AudioManager:new(_game)
 		_note_count = 0
 		_audio_volume = 0.5
 		_bgm_time_position = 0
-		_bgm_time_position_last = 0
-		_playing_time_sec = 0
-		_load_retry_elapsed_sec = 0
-		_load_retry_count = 0
 		_pre_start_time_ms = 0
 		_post_playing_time_ms = 0
 		_force_silent_fallback = false
-		_fallback_song_length_ms = 0
-		_raise_pre_start_trigger = false
-		_raise_pre_start_trigger_val = 0
-		_raise_pre_start_trigger_duration = 0
-		_raise_ended_trigger = false
-		_raise_just_finished = false
-		_audio_time_offset = Configuration.Preferences.AudioOffset
+		_load_retry_count = 0
+
+		_audio_time_offset = _base_audio_time_offset
 		_current_audio_data = SongDatabase:get_data_for_key(_song_key)
 		for i=1,#_current_audio_data.HitObjects do
 			local itr = _current_audio_data.HitObjects[i]
@@ -165,9 +166,7 @@ function AudioManager:new(_game)
 		_bgm.PlaybackSpeed = 0
 		_bgm.TimePosition = 0
 		_bgm_time_position = 0
-		_force_silent_fallback = false
-		-- Approximate: last note time plus a small buffer.
-		_fallback_song_length_ms = (_current_audio_data.LastNoteTime or 0) + 1000
+		_fallback_song_length_ms = compute_fallback_song_length_ms(_current_audio_data)
 
 		if _current_audio_data.AudioVolume ~= nil then
 			_audio_volume = _current_audio_data.AudioVolume
@@ -183,33 +182,52 @@ function AudioManager:new(_game)
 			_ended_connection = nil
 		end
 		if _song_key ~= 0 then
-			-- Ensure we don't keep module data alive after leaving a song.
 			SongDatabase:release_data_for_key(_song_key)
-			_song_key = 0
 		end
-		_current_audio_data = nil
-		_hit_sfx_group = nil
-		_force_silent_fallback = false
-		_fallback_song_length_ms = 0
 		_bgm:Destroy()
-	end
-
-	function self:force_silent_fallback()
-		if _current_audio_data == nil then
-			return
-		end
-		if _force_silent_fallback ~= true then
-			_force_silent_fallback = true
-			DebugOut:warnf("AudioManager forcing silent fallback for song_key(%s) soundid(%s)", tostring(_song_key), tostring(_bgm.SoundId))
-		end
-	end
-
-	function self:is_silent_fallback_active()
-		return _force_silent_fallback == true
 	end
 
 	function self:is_ready_to_play()
 		return _current_audio_data ~= nil and (_bgm.IsLoaded == true or _force_silent_fallback == true)
+	end
+
+	function self:load_retry()
+		if _current_audio_data == nil then
+			return
+		end
+
+		_load_retry_count = _load_retry_count + 1
+		DebugOut:puts("AudioManager:load_retry(%d)", _load_retry_count)
+
+		if _ended_connection ~= nil then
+			_ended_connection:Disconnect()
+			_ended_connection = nil
+		end
+
+		-- Recreate the Sound to retrigger streaming. Keep it muted until gameplay actually starts.
+		_bgm:Destroy()
+		_bgm = create_bgm()
+		_bgm.SoundId = _current_audio_data.AudioAssetId
+		_bgm.Playing = true
+		_bgm.Volume = 0
+		_bgm.PlaybackSpeed = 0
+		_bgm.TimePosition = 0
+	end
+
+	function self:force_silent_fallback()
+		if _force_silent_fallback == true then
+			return
+		end
+		_force_silent_fallback = true
+		DebugOut:puts("AudioManager forcing silent fallback for song_key(%s) soundid(%s)", tostring(_song_key), tostring(_bgm.SoundId))
+
+		-- Keep Sound muted/stopped; time advances via our local timer.
+		_bgm.Volume = 0
+		_bgm.PlaybackSpeed = 0
+	end
+
+	function self:is_silent_fallback_active()
+		return _force_silent_fallback == true
 	end
 
 	function self:is_prestart() return _current_mode == AudioManager.Mode.PreStart end
@@ -267,51 +285,18 @@ function AudioManager:new(_game)
 		_pre_start_time_ms = 0
 	end
 
-	function self:load_retry()
-		if _current_audio_data == nil then
-			return
-		end
-
-		_load_retry_count = _load_retry_count + 1
-		DebugOut:puts("AudioManager:load_retry(%d)", _load_retry_count)
-
-		if _ended_connection ~= nil then
-			_ended_connection:Disconnect()
-			_ended_connection = nil
-		end
-
-		if _bgm ~= nil then
-			_bgm:Destroy()
-		end
-
-		_bgm = create_bgm()
-		_bgm.SoundId = _current_audio_data.AudioAssetId
-		_bgm.Volume = 0
-		_bgm.PlaybackSpeed = 0
-		_bgm.TimePosition = 0
-		_bgm.Playing = true
-	end
-
-	function self:update_bgm_to_stored_time_position()
-		if _bgm ~= nil then
-			_bgm.TimePosition = _bgm_time_position
-		end
-	end
-
+	local _raise_pre_start_trigger = false
+	local _raise_pre_start_trigger_val = 0
+	local _raise_pre_start_trigger_duration = 0
 	function self:raise_pre_start_trigger()
 		local rtv = _raise_pre_start_trigger
 		_raise_pre_start_trigger = false
 		return rtv, _raise_pre_start_trigger_val, _raise_pre_start_trigger_duration
 	end
 
-	function self:should_playing_game_flag_as_end()
-		-- End-of-song safety check. We prefer this over relying solely on Sound.Ended.
-		-- Uses the stored time position and song length (with fallback) so we can still end cleanly if audio stalls.
-		if _current_audio_data == nil then
-			return false
-		end
-		return self:get_current_time_ms() >= self:get_song_length_ms()
-	end
+	local _raise_ended_trigger = false
+	local _raise_just_finished = false
+	-- NOTE: _ended_connection is declared above so teardown/load_retry can disconnect safely.
 
 	function self:update(dt_scale)
 		dt_scale = dt_scale * _rate
@@ -349,19 +334,20 @@ function AudioManager:new(_game)
 			end
 
 			if _pre_start_time_ms >= _pre_countdown_time_ms then
+				_bgm.TimePosition = 0
 				_bgm_time_position = 0
+
+				if _ended_connection ~= nil then
+					_ended_connection:Disconnect()
+					_ended_connection = nil
+				end
+
 				if _force_silent_fallback == true then
-					-- Keep the Sound muted/stopped; gameplay time advances locally without audio.
 					_bgm.Volume = 0
 					_bgm.PlaybackSpeed = 0
 				else
-					_bgm.TimePosition = 0
 					_bgm.Volume = _audio_volume
 					_bgm.PlaybackSpeed = _rate
-					_bgm_time_position_last = 0
-					_playing_time_sec = 0
-					_load_retry_elapsed_sec = 0
-
 					_ended_connection = _bgm.Ended:Connect(function()
 						_raise_ended_trigger = true
 						_ended_connection:Disconnect()
@@ -376,72 +362,21 @@ function AudioManager:new(_game)
 
 		elseif _current_mode == AudioManager.Mode.Playing then
 			self:update_spawn_notes(dt_scale)
-			if _force_silent_fallback == true then
-				_bgm_time_position = _bgm_time_position + CurveUtil:TimescaleToDeltaTime(dt_scale)
-				if _bgm_time_position * 1000 >= _fallback_song_length_ms then
-					_current_mode = AudioManager.Mode.PostPlaying
-				end
-				return
-			end
-
-			if self:should_playing_game_flag_as_end() then
-				_current_mode = AudioManager.Mode.PostPlaying
-				return
-			end
-
-			local time_pos = _bgm.TimePosition
-			local is_loaded = _bgm.IsLoaded
-			local is_playing = is_loaded and _bgm.Playing
-
-			local sound_delta = time_pos - _bgm_time_position_last
 			local dt_sec = CurveUtil:TimescaleToDeltaTime(dt_scale)
-			local stored_dt_sec = dt_sec
+			_bgm_time_position = _bgm_time_position + dt_sec
 
-			-- For the first second of play, trust the Sound's delta if it's moving. After that, trust dt.
-			if _playing_time_sec < 1 then
-				stored_dt_sec = sound_delta
-			end
-
-			-- Advance stored time even while audio is loading, so gameplay doesn't freeze.
-			if is_playing ~= true or (sound_delta > 0 or time_pos > 0) then
-				_bgm_time_position = _bgm_time_position + stored_dt_sec
-
-				if _bgm.IsLoaded == false then
-					_load_retry_elapsed_sec = _load_retry_elapsed_sec + dt_sec
-					if _load_retry_elapsed_sec > 10 then
-						_load_retry_elapsed_sec = 0
-						self:load_retry()
-						self:update_bgm_to_stored_time_position()
-						_bgm.Volume = _audio_volume
-						_bgm.PlaybackSpeed = _rate
-						time_pos = _bgm.TimePosition
+			if _force_silent_fallback == true or _bgm.TimeLength <= 0 then
+				local cap_sec = _fallback_song_length_ms / 1000
+				if cap_sec > 0 then
+					_bgm_time_position = math.min(_bgm_time_position, cap_sec)
+					if _bgm_time_position >= cap_sec then
+						_raise_ended_trigger = true
 					end
 				end
-
-				_playing_time_sec = _playing_time_sec + dt_sec
-
-				if self:should_playing_game_flag_as_end() then
-					_current_mode = AudioManager.Mode.PostPlaying
-					return
-				end
-
-				-- If the Sound drifts too far for too long, resync to our stored time position.
-				local diff = math.abs(_bgm_time_position - time_pos)
-				if is_playing and (diff > 0.15 and _playing_time_sec > 5) then
-					DebugOut:puts("AudioManager: Force Sync BGM src(%.3f)->bgm(%.3f) [Diff: %.3f]", _bgm.TimePosition, _bgm_time_position, diff)
-					if diff < 0.5 then
-						_bgm_time_position = time_pos
-					else
-						self:update_bgm_to_stored_time_position()
-					end
-					_playing_time_sec = 0
-					time_pos = _bgm.TimePosition
-				end
+			else
+				_bgm_time_position = math.min(_bgm_time_position, _bgm.TimeLength)
 			end
 
-			_bgm_time_position_last = time_pos
-
-			-- End condition: stop even if Sound.Ended never fires.
 			if _raise_ended_trigger == true then
 				_current_mode = AudioManager.Mode.PostPlaying
 			end
@@ -499,13 +434,10 @@ function AudioManager:new(_game)
 	end
 
 	function self:get_song_length_ms()
-		local song_length_ms = _bgm.TimeLength * 1000
-		if _force_silent_fallback == true or song_length_ms <= 0 then
-			song_length_ms = math.max(song_length_ms, _fallback_song_length_ms)
-		elseif song_length_ms > 0 then
-			song_length_ms = math.max(song_length_ms, _fallback_song_length_ms)
+		if _force_silent_fallback == true or _bgm.TimeLength <= 0 then
+			return _fallback_song_length_ms + _pre_countdown_time_ms
 		end
-		return song_length_ms + _pre_countdown_time_ms
+		return _bgm.TimeLength * 1000 + _pre_countdown_time_ms
 	end
 
 	return self
