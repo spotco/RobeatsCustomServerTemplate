@@ -13,7 +13,7 @@ SongDatabase.SongMode = {
 
 -- Maximum number of charts allowed to remain fully loaded at once.
 -- This prevents downstream templates from accidentally loading every map's note data and keeping it resident.
-local MAX_LOADED_CHARTS = 2
+local MAX_LOADED_CHARTS = 1
 
 local function shallow_copy(data)
     local copy = {}
