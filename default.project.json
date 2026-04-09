@@ -5,35 +5,29 @@
 
 		"ReplicatedStorage": {
 			"$className": "ReplicatedStorage",
-			"$path": "ReplicatedStorage",
-			"$ignoreUnknownInstances": true
+			"$path": "ReplicatedStorage"
 		},
 		"StarterPlayer": {
 			"$className": "StarterPlayer",
 			"$path": "StarterPlayer",
-			"$ignoreUnknownInstances": true,
 			"StarterPlayerScripts": {
 				"$className": "StarterPlayerScripts",
-				"$path": "StarterPlayer/StarterPlayerScripts",
-				"$ignoreUnknownInstances": true
+				"$path": "StarterPlayer/StarterPlayerScripts"
 			},
 			"StarterCharacterScripts": {
 				"$className": "StarterCharacterScripts",
-				"$path": "StarterPlayer/StarterCharacterScripts",
-				"$ignoreUnknownInstances": true
+				"$path": "StarterPlayer/StarterCharacterScripts"
 			}
 		},
 
 		"ServerScriptService": {
 			"$className": "ServerScriptService",
-			"$path": "ServerScriptService",
-			"$ignoreUnknownInstances": true
+			"$path": "ServerScriptService"
 		},
 
 		"Workspace": {
 			"$className": "Workspace",
 			"$path": "Workspace",
-			"$ignoreUnknownInstances": true,
 			"$properties": {
 				"FilteringEnabled": true
 			}
